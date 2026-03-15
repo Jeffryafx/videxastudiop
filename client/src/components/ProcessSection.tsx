@@ -1,7 +1,4 @@
-/*
- * VIDEXA STUDIO — Process Section
- * Design: Horizontal numbered steps with connecting line, dark surface background
- */
+
 
 import { MessageSquare, FileVideo, Wand2, Rocket } from "lucide-react";
 
@@ -43,7 +40,7 @@ export default function ProcessSection() {
       style={{ background: "#0E1220" }}
     >
       <div className="container relative z-10">
-        {/* Header */}
+        {}
         <div className="text-center mb-16 reveal">
           <span className="section-label block mb-3">Como trabajamos</span>
           <h2
@@ -59,9 +56,9 @@ export default function ProcessSection() {
           </h2>
         </div>
 
-        {/* Steps */}
+        {}
         <div className="relative">
-          {/* Connecting line (desktop) */}
+          {}
           <div
             className="hidden md:block absolute top-12 left-0 right-0 h-px"
             style={{ background: "linear-gradient(90deg, transparent, #252D42 20%, #252D42 80%, transparent)" }}
@@ -76,9 +73,9 @@ export default function ProcessSection() {
                   className="reveal flex flex-col items-center text-center"
                   style={{ transitionDelay: `${index * 0.12}s` }}
                 >
-                  {/* Number + Icon circle */}
+                  {}
                   <div className="relative mb-6">
-                    {/* Outer ring */}
+                    {}
                     <div
                       className="w-24 h-24 rounded-full flex items-center justify-center"
                       style={{
@@ -89,7 +86,7 @@ export default function ProcessSection() {
                     >
                       <Icon size={28} style={{ color: step.color }} />
                     </div>
-                    {/* Step number badge */}
+                    {}
                     <div
                       className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center"
                       style={{

@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import fs from "fs";
+import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
@@ -30,12 +32,54 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  // Configure body parser with larger size limit for file uploads
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  // OAuth callback under /api/oauth/callback
+
+  app.use(express.json({ limit: "500mb" }));
+  app.use(express.urlencoded({ limit: "500mb", extended: true }));
+
   registerOAuthRoutes(app);
-  // tRPC API
+
+  app.post("/api/upload-video", (req, res) => {
+    try {
+      const { filename, data } = req.body;
+      
+      if (!filename || !data) {
+        console.error("Missing filename or data:", { filename: !!filename, data: !!data });
+        return res.status(400).json({ error: "Missing filename or data" });
+      }
+
+      // Use the client/public directory as base
+      const UPLOAD_DIR = path.join(process.cwd(), "client", "public", "uploads");
+
+      // Ensure directory exists
+      if (!fs.existsSync(UPLOAD_DIR)) {
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+        console.log("Created upload directory:", UPLOAD_DIR);
+      }
+
+      const timestamp = Date.now();
+      const uniqueFilename = `video-${timestamp}-${Math.random().toString(36).substring(7)}.mp4`;
+      const filepath = path.join(UPLOAD_DIR, uniqueFilename);
+
+      // Decode base64 and write file
+      const buffer = Buffer.from(data, "base64");
+      fs.writeFileSync(filepath, buffer);
+
+      const url = `/uploads/${uniqueFilename}`;
+
+      console.log("Video uploaded successfully:", { url, size: buffer.length });
+
+      res.json({ 
+        success: true, 
+        url: url,
+        filename: uniqueFilename,
+        size: buffer.length 
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      res.status(500).json({ error: `Error al subir archivo: ${error instanceof Error ? error.message : String(error)}` });
+    }
+  });
+
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -43,7 +87,7 @@ async function startServer() {
       createContext,
     })
   );
-  // development mode uses Vite, production mode uses static files
+
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
@@ -58,7 +102,7 @@ async function startServer() {
   }
 
   server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Server running on http://localhost:${port}`);
   });
 }
 

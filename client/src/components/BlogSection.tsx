@@ -1,7 +1,4 @@
-/*
- * VIDEXA STUDIO — Blog Section
- * Design: 3-column card grid with category tags and read more links
- */
+
 
 import { ArrowRight, Clock, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
@@ -30,7 +27,7 @@ export default function BlogSection() {
       style={{ background: "#0E1220" }}
     >
       <div className="container relative z-10">
-        {/* Header */}
+        {}
         <div className="flex items-end justify-between mb-12 reveal">
           <div>
             <span className="section-label block mb-3">Conocimiento</span>
@@ -56,7 +53,7 @@ export default function BlogSection() {
           </a>
         </div>
 
-        {/* Blog cards */}
+        {}
         <div className="grid md:grid-cols-3 gap-6">
           {displayArticles.map((article, index) => {
             const categoryColors: Record<string, string> = {
@@ -74,7 +71,7 @@ export default function BlogSection() {
                 className="reveal service-card flex flex-col gap-4 group cursor-pointer"
                 style={{ transitionDelay: `${index * 0.1}s` }}
               >
-                {/* Category & Date */}
+                {}
                 <div className="flex items-center justify-between">
                   <span
                     className="text-xs font-bold uppercase tracking-wider"
@@ -92,7 +89,7 @@ export default function BlogSection() {
                   </span>
                 </div>
 
-                {/* Title */}
+                {}
                 <h3
                   className="text-lg font-semibold text-white group-hover:text-[#00E5A0] transition-colors duration-200"
                   style={{ fontFamily: "'Outfit', sans-serif" }}
@@ -100,12 +97,12 @@ export default function BlogSection() {
                   {article.title}
                 </h3>
 
-                {/* Excerpt */}
+                {}
                 <p className="text-sm text-gray-400 flex-grow">
                   {article.excerpt || article.content.substring(0, 100)}
                 </p>
 
-                {/* Footer */}
+                {}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-700">
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Clock size={14} />

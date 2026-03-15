@@ -1,9 +1,3 @@
-/*
- * VIDEXA STUDIO — Home Page
- * Design: Liquid Dark Modernism
- * Assembles all sections: Navbar, Hero, Services, Portfolio, Process, Testimonials, Blog, Contact, Footer
- */
-
 import { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
@@ -18,7 +12,6 @@ import ScrollToTop from "../components/ScrollToTop";
 
 export default function Home() {
   useEffect(() => {
-    // Intersection Observer for scroll reveal animations
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

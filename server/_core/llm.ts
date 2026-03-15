@@ -154,8 +154,7 @@ const normalizeMessage = (message: Message) => {
 
   const contentParts = ensureArray(message.content).map(normalizeContentPart);
 
-  // If there's only text content, collapse to a single string for compatibility
-  if (contentParts.length === 1 && contentParts[0].type === "text") {
+if (contentParts.length === 1 && contentParts[0].type === "text") {
     return {
       role,
       name,
@@ -212,7 +211,7 @@ const normalizeToolChoice = (
 const resolveApiUrl = () =>
   ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
     ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
+    : "https://api.openai.com/v1/chat/completions";
 
 const assertApiKey = () => {
   if (!ENV.forgeApiKey) {

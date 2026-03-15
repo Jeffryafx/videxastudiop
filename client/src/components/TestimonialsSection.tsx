@@ -1,7 +1,4 @@
-/*
- * VIDEXA STUDIO — Testimonials Section
- * Design: Card grid with star ratings, client avatars, dark glassmorphism
- */
+
 
 import { Star, Quote } from "lucide-react";
 
@@ -41,7 +38,7 @@ export default function TestimonialsSection() {
       className="relative py-24 overflow-hidden"
       style={{ background: "#080B12" }}
     >
-      {/* Glow orb */}
+      {}
       <div
         className="glow-orb"
         style={{
@@ -55,7 +52,7 @@ export default function TestimonialsSection() {
       />
 
       <div className="container relative z-10">
-        {/* Header */}
+        {}
         <div className="text-center mb-16 reveal">
           <span className="section-label block mb-3">Lo que dicen</span>
           <h2
@@ -71,7 +68,7 @@ export default function TestimonialsSection() {
           </h2>
         </div>
 
-        {/* Testimonial cards */}
+        {}
         <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((t, index) => (
             <div
@@ -79,17 +76,17 @@ export default function TestimonialsSection() {
               className="reveal service-card flex flex-col gap-4"
               style={{ transitionDelay: `${index * 0.1}s` }}
             >
-              {/* Quote icon */}
+              {}
               <Quote size={24} style={{ color: t.avatarColor, opacity: 0.5 }} />
 
-              {/* Stars */}
+              {}
               <div className="flex gap-1">
                 {Array.from({ length: t.rating }).map((_, i) => (
                   <Star key={i} size={14} fill="#00E5A0" style={{ color: "#00E5A0" }} />
                 ))}
               </div>
 
-              {/* Text */}
+              {}
               <p
                 className="text-[#6B7494] text-sm leading-relaxed flex-1"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
@@ -97,7 +94,7 @@ export default function TestimonialsSection() {
                 "{t.text}"
               </p>
 
-              {/* Author */}
+              {}
               <div className="flex items-center gap-3 pt-4 border-t border-[#252D42]">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"

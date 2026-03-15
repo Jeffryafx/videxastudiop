@@ -10,16 +10,18 @@ import ClientDashboard from "./pages/ClientDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import BlogArticle from "./pages/BlogArticle";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"//"} component={Home} />
+      <Route path={"/"} component={Home} />
       <Route path={"/login"} component={Login} />
       <Route path={"/register"} component={Register} />
       <Route path={"/forgot-password"} component={ForgotPassword} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/dashboard"} component={ClientDashboard} />
+      <Route path={"/blog/:slug"} component={BlogArticle} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

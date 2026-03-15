@@ -1,48 +1,39 @@
-/*
- * VIDEXA STUDIO — Services Section
- * Design: 3-column offset grid, glassmorphism cards, stagger animation
- * Cards: hover scale(1.03) + emerald border glow
- */
 
-import { Scissors, Sparkles, Package, CheckCircle } from "lucide-react";
 
-const services = [
-  {
+import { Scissors, Sparkles, Package, CheckCircle, Loader2 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+
+const serviceMetadata = {
+  'motion-edit': {
     icon: Scissors,
     iconColor: "#22D3EE",
     iconBg: "rgba(34,211,238,0.1)",
-    title: "Motion Edit",
-    description: "Cortes dinamicos, captions animados y color grading profesional.",
-    price: "desde $25",
     features: ["Cortes dinamicos", "Captions animados", "Color grading", "Musica sincronizada"],
     popular: false,
     delay: "0s",
   },
-  {
+  'motion-graphics': {
     icon: Sparkles,
     iconColor: "#7C5CFC",
     iconBg: "rgba(124,92,252,0.1)",
-    title: "Motion Graphics",
-    description: "Animaciones avanzadas, motion graphics y elementos de marca.",
-    price: "mas popular",
     features: ["Animaciones 2D/3D", "Elementos de marca", "Transiciones premium", "Lower thirds"],
     popular: true,
     delay: "0.1s",
   },
-  {
+  'brand-pack': {
     icon: Package,
     iconColor: "#00E5A0",
     iconBg: "rgba(0,229,160,0.1)",
-    title: "Brand Pack",
-    description: "Paquete mensual con branding completo, intro/outro y logo.",
-    price: "desde $75",
     features: ["Branding completo", "Intro / Outro", "Logo animado", "Soporte mensual"],
     popular: false,
     delay: "0.2s",
   },
-];
+} as const;
 
 export default function ServicesSection() {
+  const servicesQuery = trpc.services.list.useQuery();
+  const services = servicesQuery.data || [];
+
   const scrollToContact = () => {
     const el = document.querySelector("#contacto");
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -54,10 +45,10 @@ export default function ServicesSection() {
       className="relative py-24 overflow-hidden"
       style={{ background: "#080B12" }}
     >
-      {/* Dot grid background */}
+      {}
       <div className="absolute inset-0 dot-grid opacity-40" />
 
-      {/* Glow orb */}
+      {}
       <div
         className="glow-orb"
         style={{
@@ -71,7 +62,7 @@ export default function ServicesSection() {
       />
 
       <div className="container relative z-10">
-        {/* Section header */}
+        {}
         <div className="text-center mb-16 reveal">
           <span className="section-label block mb-3">Lo que hacemos</span>
           <h2
@@ -93,111 +84,115 @@ export default function ServicesSection() {
           </p>
         </div>
 
-        {/* Cards grid */}
+        {}
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {services.map((service, index) => {
-            const Icon = service.icon;
-            return (
-              <div
-                key={service.title}
-                className={`service-card reveal flex flex-col ${service.popular ? "ring-1 ring-[#7C5CFC]/40" : ""}`}
-                style={{
-                  animationDelay: service.delay,
-                  transitionDelay: `${index * 0.1}s`,
-                  ...(service.popular
-                    ? { boxShadow: "0 0 40px rgba(124,92,252,0.15), 0 0 0 1px rgba(124,92,252,0.2)" }
-                    : {}),
-                }}
-              >
-                {/* Popular badge */}
-                {service.popular && (
-                  <div className="flex justify-end mb-3">
-                    <span className="badge-popular">mas popular</span>
-                  </div>
-                )}
+          {servicesQuery.isLoading ? (
+            <div className="col-span-3 flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-[#00E5A0]" />
+            </div>
+          ) : (
+            services.map((service: any, index: number) => {
+              const metadata = serviceMetadata[service.category as keyof typeof serviceMetadata];
+              if (!metadata) return null;
 
-                {/* Icon */}
+              const Icon = metadata.icon;
+              return (
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                  style={{ background: service.iconBg }}
-                >
-                  <Icon size={22} style={{ color: service.iconColor }} />
-                </div>
-
-                {/* Title & description */}
-                <h3
+                  key={service.id}
+                  className={`service-card reveal flex flex-col ${metadata.popular ? "ring-1 ring-[#7C5CFC]/40" : ""}`}
                   style={{
-                    fontFamily: "'Outfit', sans-serif",
-                    fontWeight: 700,
-                    fontSize: "1.25rem",
-                    color: "#EEF0F7",
-                    marginBottom: "0.5rem",
+                    animationDelay: metadata.delay,
+                    transitionDelay: `${index * 0.1}s`,
+                    ...(metadata.popular
+                      ? { boxShadow: "0 0 40px rgba(124,92,252,0.15), 0 0 0 1px rgba(124,92,252,0.2)" }
+                      : {}),
                   }}
                 >
-                  {service.title}
-                </h3>
-                <p
-                  className="text-[#6B7494] text-sm leading-relaxed mb-6"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                >
-                  {service.description}
-                </p>
+                  {metadata.popular && (
+                    <div className="flex justify-end mb-3">
+                      <span className="badge-popular">mas popular</span>
+                    </div>
+                  )}
 
-                {/* Features */}
-                <ul className="flex flex-col gap-2.5 mb-6 flex-1">
-                  {service.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2.5">
-                      <CheckCircle size={14} className="flex-shrink-0" style={{ color: service.iconColor }} />
-                      <span
-                        className="text-[#6B7494] text-sm"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                      >
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+                    style={{ background: metadata.iconBg }}
+                  >
+                    <Icon size={22} style={{ color: metadata.iconColor }} />
+                  </div>
 
-                {/* Price & CTA */}
-                <div className="mt-auto pt-5 border-t border-[#252D42] flex items-center justify-between">
-                  <span
+                  <h3
                     style={{
                       fontFamily: "'Outfit', sans-serif",
-                      fontWeight: 800,
-                      fontSize: "1.1rem",
-                      color: service.popular ? "#7C5CFC" : "#00E5A0",
+                      fontWeight: 700,
+                      fontSize: "1.25rem",
+                      color: "#EEF0F7",
+                      marginBottom: "0.5rem",
                     }}
                   >
-                    {service.price}
-                  </span>
-                  <button
-                    onClick={scrollToContact}
-                    className="text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-200"
-                    style={{
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      background: service.popular
-                        ? "linear-gradient(135deg, #7C5CFC, #22D3EE)"
-                        : "transparent",
-                      color: service.popular ? "white" : "#00E5A0",
-                      border: service.popular ? "none" : "1px solid rgba(0,229,160,0.3)",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!service.popular) {
-                        (e.target as HTMLElement).style.background = "rgba(0,229,160,0.1)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!service.popular) {
-                        (e.target as HTMLElement).style.background = "transparent";
-                      }
-                    }}
+                    {service.name}
+                  </h3>
+                  <p
+                    className="text-[#6B7494] text-sm leading-relaxed mb-6"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   >
-                    Cotizar
-                  </button>
+                    {service.description}
+                  </p>
+
+                  <ul className="flex flex-col gap-2.5 mb-6 flex-1">
+                    {(service.features ? service.features.split(',').map((f: string) => f.trim()) : []).map((feature: string) => (
+                      <li key={feature} className="flex items-center gap-2.5">
+                        <CheckCircle size={14} className="flex-shrink-0" style={{ color: metadata.iconColor }} />
+                        <span
+                          className="text-[#6B7494] text-sm"
+                          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                        >
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-auto pt-5 border-t border-[#252D42] flex items-center justify-between">
+                    <span
+                      style={{
+                        fontFamily: "'Outfit', sans-serif",
+                        fontWeight: 800,
+                        fontSize: "1.1rem",
+                        color: metadata.popular ? "#7C5CFC" : "#00E5A0",
+                      }}
+                    >
+                      ${parseFloat(service.basePrice).toFixed(2)}
+                    </span>
+                    <button
+                      onClick={scrollToContact}
+                      className="text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-200"
+                      style={{
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        background: metadata.popular
+                          ? "linear-gradient(135deg, #7C5CFC, #22D3EE)"
+                          : "transparent",
+                        color: metadata.popular ? "white" : "#00E5A0",
+                        border: metadata.popular ? "none" : "1px solid rgba(0,229,160,0.3)",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!metadata.popular) {
+                          (e.target as HTMLElement).style.background = "rgba(0,229,160,0.1)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!metadata.popular) {
+                          (e.target as HTMLElement).style.background = "transparent";
+                        }
+                      }}
+                    >
+                      Cotizar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
     </section>

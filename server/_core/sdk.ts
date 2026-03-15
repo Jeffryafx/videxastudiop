@@ -14,7 +14,7 @@ import type {
   GetUserInfoWithJwtRequest,
   GetUserInfoWithJwtResponse,
 } from "./types/manusTypes";
-// Utility function
+
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.length > 0;
 
@@ -113,24 +113,14 @@ class SDKServer {
     return first ? first.toLowerCase() : null;
   }
 
-  /**
-   * Exchange OAuth authorization code for access token
-   * @example
-   * const tokenResponse = await sdk.exchangeCodeForToken(code, state);
-   */
-  async exchangeCodeForToken(
+async exchangeCodeForToken(
     code: string,
     state: string
   ): Promise<ExchangeTokenResponse> {
     return this.oauthService.getTokenByCode(code, state);
   }
 
-  /**
-   * Get user information using access token
-   * @example
-   * const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
-   */
-  async getUserInfo(accessToken: string): Promise<GetUserInfoResponse> {
+async getUserInfo(accessToken: string): Promise<GetUserInfoResponse> {
     const data = await this.oauthService.getUserInfoByToken({
       accessToken,
     } as ExchangeTokenResponse);
@@ -159,12 +149,7 @@ class SDKServer {
     return new TextEncoder().encode(secret);
   }
 
-  /**
-   * Create a session token for a Manus user openId
-   * @example
-   * const sessionToken = await sdk.createSessionToken(userInfo.openId);
-   */
-  async createSessionToken(
+async createSessionToken(
     openId: string,
     options: { expiresInMs?: number; name?: string } = {}
   ): Promise<string> {
@@ -257,21 +242,19 @@ class SDKServer {
   }
 
   async authenticateRequest(req: Request): Promise<User> {
-    // Regular authentication flow
+
     const cookies = this.parseCookies(req.headers.cookie);
     const sessionCookie = cookies.get(COOKIE_NAME);
-    
-    // First try to verify as JWT (OAuth flow)
-    const session = await this.verifySession(sessionCookie);
+
+const session = await this.verifySession(sessionCookie);
 
     if (session) {
-      // OAuth flow
+
       const sessionUserId = session.openId;
       const signedInAt = new Date();
       let user = await db.getUserByOpenId(sessionUserId);
 
-      // If user not in DB, sync from OAuth server automatically
-      if (!user) {
+if (!user) {
         try {
           const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");
           await db.upsertUser({
@@ -301,7 +284,7 @@ class SDKServer {
 
       return user;
     } else if (sessionCookie) {
-      // Try email/password flow - sessionCookie contains user ID
+
       try {
         const userId = parseInt(sessionCookie, 10);
         if (!isNaN(userId)) {

@@ -1,7 +1,4 @@
-/*
- * VIDEXA STUDIO — Client Dashboard
- * Track quotes, projects, and payments
- */
+
 
 import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -19,8 +16,7 @@ export default function ClientDashboard() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("quotes");
 
-  // Fetch data
-  const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.useQuery(undefined, {
+const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.useQuery(undefined, {
     enabled: !!user,
   });
 
@@ -79,7 +75,7 @@ export default function ClientDashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Mi Panel</h1>
@@ -90,7 +86,7 @@ export default function ClientDashboard() {
           </Button>
         </div>
 
-        {/* Notifications */}
+        {}
         {notifications && notifications.length > 0 && (
           <Card className="border-blue-200 bg-blue-50">
             <CardHeader>
@@ -109,7 +105,7 @@ export default function ClientDashboard() {
           </Card>
         )}
 
-        {/* Stats Cards */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="pb-2">
@@ -145,14 +141,14 @@ export default function ClientDashboard() {
           </Card>
         </div>
 
-        {/* Tabs */}
+        {}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="quotes">Cotizaciones</TabsTrigger>
             <TabsTrigger value="projects">Proyectos</TabsTrigger>
           </TabsList>
 
-          {/* Quotes Tab */}
+          {}
           <TabsContent value="quotes" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold">Mis Cotizaciones</h2>
@@ -211,7 +207,7 @@ export default function ClientDashboard() {
             )}
           </TabsContent>
 
-          {/* Projects Tab */}
+          {}
           <TabsContent value="projects" className="space-y-4">
             <h2 className="text-lg font-semibold">Mis Proyectos</h2>
 

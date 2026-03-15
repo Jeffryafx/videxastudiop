@@ -171,7 +171,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast as sonnerToast } from "sonner";
-import { AIChatBox, type Message } from "@/components/AIChatBox";
 
 export default function ComponentsShowcase() {
   const { theme, toggleTheme } = useTheme();
@@ -187,12 +186,6 @@ export default function ComponentsShowcase() {
   const [dialogInput, setDialogInput] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // AI ChatBox demo state
-  const [chatMessages, setChatMessages] = useState<Message[]>([
-    { role: "system", content: "You are a helpful assistant." },
-  ]);
-  const [isChatLoading, setIsChatLoading] = useState(false);
-
   const handleDialogSubmit = () => {
     console.log("Dialog submitted with value:", dialogInput);
     sonnerToast.success("Submitted successfully", {
@@ -207,23 +200,6 @@ export default function ComponentsShowcase() {
       e.preventDefault();
       handleDialogSubmit();
     }
-  };
-
-  const handleChatSend = (content: string) => {
-    // Add user message
-    const newMessages: Message[] = [...chatMessages, { role: "user", content }];
-    setChatMessages(newMessages);
-
-    // Simulate AI response with delay
-    setIsChatLoading(true);
-    setTimeout(() => {
-      const aiResponse: Message = {
-        role: "assistant",
-        content: `This is a **demo response**. In a real app, you would call a tRPC mutation here:\n\n\`\`\`typescript\nconst chatMutation = trpc.ai.chat.useMutation({\n  onSuccess: (response) => {\n    setChatMessages(prev => [...prev, {\n      role: "assistant",\n      content: response.choices[0].message.content\n    }]);\n  }\n});\n\nchatMutation.mutate({ messages: newMessages });\n\`\`\`\n\nYour message was: "${content}"`,
-      };
-      setChatMessages([...newMessages, aiResponse]);
-      setIsChatLoading(false);
-    }, 1500);
   };
 
   return (
@@ -243,7 +219,7 @@ export default function ComponentsShowcase() {
         </div>
 
         <div className="space-y-12">
-          {/* Text Colors Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Text Colors</h3>
             <Card>
@@ -322,7 +298,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Color Combinations Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Color Combinations</h3>
             <Card>
@@ -381,7 +357,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Buttons Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Buttons</h3>
             <Card>
@@ -403,7 +379,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Form Inputs Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Form Inputs</h3>
             <Card>
@@ -677,7 +653,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Data Display Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Data Display</h3>
             <Card>
@@ -696,7 +672,7 @@ export default function ComponentsShowcase() {
                   <Label>Avatar</Label>
                   <div className="flex gap-4">
                     <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=CN" />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <Avatar>
@@ -866,7 +842,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Alerts Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Alerts</h3>
             <div className="space-y-4">
@@ -887,7 +863,7 @@ export default function ComponentsShowcase() {
             </div>
           </section>
 
-          {/* Tabs Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Tabs</h3>
             <Tabs defaultValue="account" className="w-full">
@@ -956,7 +932,7 @@ export default function ComponentsShowcase() {
             </Tabs>
           </section>
 
-          {/* Accordion Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Accordion</h3>
             <Accordion type="single" collapsible className="w-full">
@@ -983,7 +959,7 @@ export default function ComponentsShowcase() {
             </Accordion>
           </section>
 
-          {/* Collapsible Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Collapsible</h3>
             <Collapsible>
@@ -1014,7 +990,7 @@ export default function ComponentsShowcase() {
             </Collapsible>
           </section>
 
-          {/* Dialog, Sheet, Drawer Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Overlays</h3>
             <Card>
@@ -1118,7 +1094,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Menus Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Menus</h3>
             <Card>
@@ -1169,7 +1145,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Calendar Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Calendar</h3>
             <Card>
@@ -1184,7 +1160,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Carousel Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Carousel</h3>
             <Card>
@@ -1212,7 +1188,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Toggle Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Toggle</h3>
             <Card>
@@ -1253,7 +1229,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Aspect Ratio & Scroll Area Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Layout Components</h3>
             <Card>
@@ -1285,7 +1261,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Resizable Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Resizable Panels</h3>
             <Card>
@@ -1310,7 +1286,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* Toast Section */}
+          {}
           <section className="space-y-4">
             <h3 className="text-2xl font-semibold">Toast</h3>
             <Card>
@@ -1391,40 +1367,7 @@ export default function ComponentsShowcase() {
             </Card>
           </section>
 
-          {/* AI ChatBox Section */}
-          <section className="space-y-4">
-            <h3 className="text-2xl font-semibold">AI ChatBox</h3>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="text-sm text-muted-foreground">
-                    <p>
-                      A ready-to-use chat interface component that integrates with the LLM system.
-                      Features markdown rendering, auto-scrolling, and loading states.
-                    </p>
-                    <p className="mt-2">
-                      This is a demo with simulated responses. In a real app, you'd connect it to a tRPC mutation.
-                    </p>
-                  </div>
-                  <AIChatBox
-                    messages={chatMessages}
-                    onSendMessage={handleChatSend}
-                    isLoading={isChatLoading}
-                    placeholder="Try sending a message..."
-                    height="500px"
-                    emptyStateMessage="How can I help you today?"
-                    suggestedPrompts={[
-                      "What is React?",
-                      "Explain TypeScript",
-                      "How to use tRPC?",
-                      "Best practices for web development",
-                    ]}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </section>
-        </div>
+</div>
       </main>
 
       <footer className="border-t py-6 mt-12">

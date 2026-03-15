@@ -1,7 +1,4 @@
-/*
- * VIDEXA STUDIO — Admin Dashboard
- * Manage quotes, projects, payments, and client communications
- */
+
 
 import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -18,9 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle, Clock, AlertCircle, DollarSign, Loader2, LogOut, BookOpen, Film } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle, DollarSign, Loader2, LogOut, BookOpen, Film, Package } from "lucide-react";
 import AdminBlog from "./AdminBlog";
 import AdminPortfolio from "./AdminPortfolio";
+import AdminServices from "./AdminServices";
 import { toast } from "sonner";
 
 export default function AdminDashboard() {
@@ -30,8 +28,7 @@ export default function AdminDashboard() {
 
   console.log('[AdminDashboard] User info:', { user, loading: authLoading, role: user?.role });
 
-  // Fetch data
-  const { data: quotes, isLoading: quotesLoading, refetch: refetchQuotes } = trpc.quotes.list.useQuery(undefined, {
+const { data: quotes, isLoading: quotesLoading, refetch: refetchQuotes } = trpc.quotes.list.useQuery(undefined, {
     enabled: user?.role === "admin" && !authLoading,
   });
 
@@ -39,8 +36,7 @@ export default function AdminDashboard() {
     enabled: user?.role === "admin" && !authLoading,
   });
 
-  // Mutations
-  const updateQuoteStatus = trpc.quotes.updateStatus.useMutation({
+const updateQuoteStatus = trpc.quotes.updateStatus.useMutation({
     onSuccess: () => {
       toast.success("Estado actualizado");
       refetchQuotes();
@@ -64,8 +60,7 @@ export default function AdminDashboard() {
     setLocation("/");
   };
 
-  // Mostrar skeleton mientras se carga
-  if (authLoading) {
+if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin" />
@@ -73,9 +68,8 @@ export default function AdminDashboard() {
     );
   }
 
-  // Validar que es admin DESPUÉS de que loading es false
-  console.log('[AdminDashboard] Validando acceso:', { role: user?.role, isAdmin: user?.role === "admin" });
-  
+console.log('[AdminDashboard] Validando acceso:', { role: user?.role, isAdmin: user?.role === "admin" });
+
   if (!user) {
     console.log('[AdminDashboard] Usuario no autenticado');
     return (
@@ -150,7 +144,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
+      {}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div>
@@ -168,9 +162,9 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Main Content */}
+      {}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-2">
@@ -209,11 +203,15 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Tabs */}
+        {}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList>
             <TabsTrigger value="quotes">Cotizaciones</TabsTrigger>
             <TabsTrigger value="projects">Proyectos</TabsTrigger>
+            <TabsTrigger value="services" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              Servicios
+            </TabsTrigger>
             <TabsTrigger value="blog" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               Blog
@@ -224,7 +222,7 @@ export default function AdminDashboard() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Quotes Tab */}
+          {}
           <TabsContent value="quotes" className="space-y-4">
             <Card>
               <CardHeader>
@@ -306,7 +304,7 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Projects Tab */}
+          {}
           <TabsContent value="projects" className="space-y-4">
             <Card>
               <CardHeader>
@@ -392,12 +390,15 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Blog Tab */}
+          <TabsContent value="services" className="space-y-4">
+            <AdminServices />
+          </TabsContent>
+
           <TabsContent value="blog" className="space-y-4">
             <AdminBlog />
           </TabsContent>
 
-          {/* Portfolio Tab */}
+          {}
           <TabsContent value="portfolio" className="space-y-4">
             <AdminPortfolio />
           </TabsContent>

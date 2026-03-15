@@ -1,7 +1,8 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { 
-  InsertUser, 
+import mysql from "mysql2/promise";
+import {
+  InsertUser,
   users,
   quotes,
   projects,
@@ -24,22 +25,22 @@ import {
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
-let _db: ReturnType<typeof drizzle> | null = null;
+let _db: any = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
-    }
+  if (!_db) {
+    const connectionConfig = process.env.DATABASE_URL ? process.env.DATABASE_URL : {
+      host: process.env.DB_HOST || "localhost",
+      port: parseInt(process.env.DB_PORT || "3306"),
+      user: process.env.DB_USER || "root",
+      password: process.env.DB_PASSWORD || "",
+      database: process.env.DB_NAME || "videxa",
+    };
+    const pool = mysql.createPool(connectionConfig as any);
+    _db = drizzle(pool) as any;
   }
   return _db;
 }
-
-// ==================== USER QUERIES ====================
 
 export async function upsertUser(user: Partial<InsertUser> & { openId: string }): Promise<void> {
   if (!user.openId) {
@@ -92,7 +93,7 @@ export async function upsertUser(user: Partial<InsertUser> & { openId: string })
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values as InsertUser).onDuplicateKeyUpdate({
+await db.insert(users).values(values as InsertUser).onDuplicateKeyUpdate({
       set: updateSet,
     });
   } catch (error) {
@@ -158,8 +159,6 @@ export async function getAdminUsers() {
   return await db.select().from(users).where(eq(users.role, 'admin'));
 }
 
-// ==================== SERVICES QUERIES ====================
-
 export async function getServices() {
   const db = await getDb();
   if (!db) return [];
@@ -177,10 +176,24 @@ export async function createService(data: InsertService) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const result = await db.insert(services).values(data);
+  const insertedId = result[0].insertId;
+  const service = await db.select().from(services).where(eq(services.id, insertedId as any)).limit(1);
+  return service[0];
+}
+
+export async function updateService(id: number, data: Partial<InsertService>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.update(services).set(data).where(eq(services.id, id));
   return result;
 }
 
-// ==================== QUOTES QUERIES ====================
+export async function deleteService(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.update(services).set({ isActive: false }).where(eq(services.id, id));
+  return result;
+}
 
 export async function createQuote(data: InsertQuote) {
   const db = await getDb();
@@ -213,8 +226,6 @@ export async function updateQuoteStatus(id: number, status: string) {
   if (!db) throw new Error("Database not available");
   return await db.update(quotes).set({ status: status as any }).where(eq(quotes.id, id));
 }
-
-// ==================== PROJECTS QUERIES ====================
 
 export async function createProject(data: InsertProject) {
   const db = await getDb();
@@ -254,8 +265,6 @@ export async function updateProjectProgress(id: number, data: Partial<typeof pro
   return await db.update(projects).set({ ...data, updatedAt: new Date() }).where(eq(projects.id, id));
 }
 
-// ==================== PROJECT UPDATES QUERIES ====================
-
 export async function addProjectUpdate(data: InsertProjectUpdate) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -267,8 +276,6 @@ export async function getProjectUpdates(projectId: number) {
   if (!db) return [];
   return await db.select().from(projectUpdates).where(eq(projectUpdates.projectId, projectId)).orderBy(desc(projectUpdates.createdAt));
 }
-
-// ==================== PAYMENTS QUERIES ====================
 
 export async function createPayment(data: InsertPayment) {
   const db = await getDb();
@@ -292,14 +299,12 @@ export async function getProjectPayments(projectId: number) {
 export async function updatePaymentStatus(id: number, status: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.update(payments).set({ 
+  return await db.update(payments).set({
     paymentStatus: status as any,
     paidAt: status === 'completed' ? new Date() : undefined,
     updatedAt: new Date()
   }).where(eq(payments.id, id));
 }
-
-// ==================== NOTIFICATIONS QUERIES ====================
 
 export async function createNotification(data: InsertNotification) {
   const db = await getDb();
@@ -319,8 +324,6 @@ export async function markNotificationAsRead(id: number) {
   return await db.update(notifications).set({ isRead: true }).where(eq(notifications.id, id));
 }
 
-// ==================== EMAIL LOGS QUERIES ====================
-
 export async function logEmail(data: InsertEmailLog) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -333,12 +336,13 @@ export async function getEmailLogs(limit: number = 100) {
   return await db.select().from(emailLogs).orderBy(desc(emailLogs.createdAt)).limit(limit);
 }
 
-// ==================== PORTFOLIO ITEMS QUERIES ====================
-
 export async function createPortfolioItem(data: InsertPortfolioItem) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.insert(portfolioItems).values(data);
+  const result = await db.insert(portfolioItems).values(data);
+  const insertedId = result[0].insertId;
+  const item = await db.select().from(portfolioItems).where(eq(portfolioItems.id, insertedId as any)).limit(1);
+  return item[0];
 }
 
 export async function getPublicPortfolioItems() {
@@ -365,12 +369,14 @@ export async function deletePortfolioItem(id: number) {
   return await db.delete(portfolioItems).where(eq(portfolioItems.id, id));
 }
 
-// ==================== BLOG ARTICLES QUERIES ====================
-
 export async function createBlogArticle(data: InsertBlogArticle) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.insert(blogArticles).values(data);
+  const result = await db.insert(blogArticles).values(data);
+  // Retrieve the created article
+  const insertedId = result[0].insertId;
+  const article = await getBlogArticleById(insertedId as any);
+  return article;
 }
 
 export async function getBlogArticles(limit?: number) {

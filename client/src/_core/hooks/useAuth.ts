@@ -54,14 +54,14 @@ export function useAuth(options?: UseAuthOptions) {
       error: meQuery.error ?? logoutMutation.error ?? null,
       isAuthenticated: Boolean(meQuery.data),
     };
-    
-    console.log('[useAuth] Estado actualizado:', { 
-      user: userState.user?.email, 
+
+    console.log('[useAuth] Estado actualizado:', {
+      user: userState.user?.email,
       role: userState.user?.role,
       loading: userState.loading,
       isAuthenticated: userState.isAuthenticated
     });
-    
+
     return userState;
   }, [
     meQuery.data,

@@ -1,7 +1,4 @@
-/*
- * VIDEXA STUDIO — Footer
- * Design: Dark surface with emerald brand accent, minimal links
- */
+
 
 import { Instagram, Youtube, Twitter, Heart } from "lucide-react";
 
@@ -16,11 +13,11 @@ export default function Footer() {
       className="relative border-t border-[#252D42]"
       style={{ background: "#080B12" }}
     >
-      {/* Stats band */}
+      {}
       <div
         className="relative overflow-hidden"
         style={{
-          backgroundImage: "url(https://d2xsxph8kpxj0f.cloudfront.net/310519663438801757/7KKxXnXYeQKbj9epp3KDoh/videxa-stats-bg-9D46cKoXpNQU6xddFadFje.webp)",
+          backgroundImage: "url(data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -53,10 +50,10 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Main footer */}
+      {}
       <div className="container py-12">
         <div className="grid md:grid-cols-4 gap-10">
-          {/* Brand */}
+          {}
           <div className="md:col-span-2 flex flex-col gap-4">
             <div className="flex items-center gap-2.5">
               <div className="relative w-8 h-8">
@@ -81,7 +78,7 @@ export default function Footer() {
             >
               Videos que paran el scroll y convierten seguidores en clientes. Edicion profesional desde Colombia para el mundo.
             </p>
-            {/* Social links */}
+            {}
             <div className="flex gap-3 mt-2">
               {[
                 { icon: Instagram, label: "Instagram" },
@@ -101,7 +98,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Navigation */}
+          {}
           <div className="flex flex-col gap-3">
             <h4
               className="text-[#EEF0F7] text-sm font-semibold mb-1"
@@ -127,7 +124,7 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* Services */}
+          {}
           <div className="flex flex-col gap-3">
             <h4
               className="text-[#EEF0F7] text-sm font-semibold mb-1"
@@ -149,7 +146,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {}
         <div className="mt-12 pt-6 border-t border-[#252D42] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p
             className="text-[#6B7494] text-xs flex items-center gap-1.5"

@@ -7,8 +7,6 @@ import * as db from "./db";
 import { TRPCError } from "@trpc/server";
 import { registerUser, loginUser, requestPasswordReset, resetPasswordWithToken } from "./auth";
 
-// ==================== ADMIN PROCEDURE ====================
-
 const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   if (ctx.user?.role !== 'admin') {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
@@ -16,19 +14,16 @@ const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   return next({ ctx });
 });
 
-// ==================== MAIN ROUTER ====================
-
 export const appRouter = router({
   system: systemRouter,
-  
-  // ==================== AUTH ====================
-  auth: router({
+
+auth: router({
     me: publicProcedure.query(opts => {
       const user = opts.ctx.user;
       console.log('[Auth.Me] Consultando usuario actual:', { id: user?.id, email: user?.email, role: user?.role });
       return user;
     }),
-    
+
     register: publicProcedure
       .input(z.object({
         email: z.string().email(),
@@ -39,7 +34,7 @@ export const appRouter = router({
         await registerUser(input.email, input.password, input.name, "user");
         return { success: true, message: "Usuario registrado exitosamente" };
       }),
-    
+
     login: publicProcedure
       .input(z.object({
         email: z.string().email(),
@@ -47,37 +42,36 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const user = await loginUser(input.email, input.password);
-        
-        // Create session cookie
-        const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, user.id.toString(), { ...cookieOptions, maxAge: COOKIE_MAX_AGE });
-        
+
         console.log('[Auth.Login] Usuario logueado:', { id: user.id, email: user.email, role: user.role });
-        
-        return { 
-          success: true, 
-          user: { 
-            id: user.id, 
-            email: user.email, 
-            name: user.name, 
-            role: user.role 
-          } 
+
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role
+          }
         };
       }),
-    
+
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
-    
+
     requestPasswordReset: publicProcedure
       .input(z.object({ email: z.string().email() }))
       .mutation(async ({ input }) => {
         return await requestPasswordReset(input.email);
       }),
-    
+
     resetPassword: publicProcedure
       .input(z.object({
         token: z.string(),
@@ -95,12 +89,11 @@ export const appRouter = router({
       }),
   }),
 
-  // ==================== SERVICES ====================
-  services: router({
+services: router({
     list: publicProcedure.query(async () => {
       return await db.getServices();
     }),
-    
+
     getById: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
       return await db.getServiceById(input.id);
     }),
@@ -113,6 +106,7 @@ export const appRouter = router({
         basePrice: z.string(),
         icon: z.string().optional(),
         category: z.string(),
+        features: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         return await db.createService({
@@ -122,13 +116,34 @@ export const appRouter = router({
           basePrice: input.basePrice as any,
           icon: input.icon,
           category: input.category,
+          features: input.features,
           isActive: true,
         });
       }),
+
+    update: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        description: z.string().optional(),
+        basePrice: z.string().optional(),
+        icon: z.string().optional(),
+        category: z.string().optional(),
+        features: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...updateData } = input;
+        return await db.updateService(id, updateData as any);
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        return await db.deleteService(input.id);
+      }),
   }),
 
-  // ==================== QUOTES ====================
-  quotes: router({
+quotes: router({
     create: publicProcedure
       .input(z.object({
         serviceId: z.number(),
@@ -138,7 +153,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
-        
+
         const quote = await db.createQuote({
           clientId: ctx.user.id,
           serviceId: input.serviceId,
@@ -148,12 +163,11 @@ export const appRouter = router({
           status: 'pending',
         });
 
-        // Create notification for admin
-        const quoteId = (quote as any).insertId || (quote as any)[0]?.id || 0;
+const quoteId = (quote as any).insertId || (quote as any)[0]?.id || 0;
         if (quoteId) {
           const admins = await db.getAdminUsers();
-          const firstAdminId = admins.length > 0 ? admins[0].id : 1; // Fallback to ID 1 if no admin found
-          
+          const firstAdminId = admins.length > 0 ? admins[0].id : 1;
+
           await db.createNotification({
             userId: firstAdminId,
             type: 'quote-created',
@@ -186,8 +200,7 @@ export const appRouter = router({
 
         await db.updateQuoteStatus(input.id, input.status);
 
-        // Notify client
-        const notificationType = input.status === 'approved' ? 'quote-approved' : 'quote-rejected';
+const notificationType = input.status === 'approved' ? 'quote-approved' : 'quote-rejected';
         await db.createNotification({
           userId: quote.clientId,
           type: notificationType as any,
@@ -200,8 +213,7 @@ export const appRouter = router({
       }),
   }),
 
-  // ==================== PROJECTS ====================
-  projects: router({
+projects: router({
     create: protectedProcedure
       .input(z.object({
         quoteId: z.number(),
@@ -224,8 +236,7 @@ export const appRouter = router({
           dueDate: input.dueDate,
         });
 
-        // Create notification
-        const projectId = (project as any).insertId || (project as any)[0]?.id || 0;
+const projectId = (project as any).insertId || (project as any)[0]?.id || 0;
         if (projectId) {
           await db.createNotification({
             userId: ctx.user.id,
@@ -259,8 +270,7 @@ export const appRouter = router({
 
         await db.updateProjectStatus(input.id, input.status);
 
-        // Notify client
-        await db.createNotification({
+await db.createNotification({
           userId: project.clientId,
           type: 'project-update',
           title: `Tu proyecto ha sido actualizado`,
@@ -280,7 +290,7 @@ export const appRouter = router({
         }
 
         await db.updateProjectProgress(input.projectId, { clientFilesUrl: input.fileUrl });
-        
+
         await db.addProjectUpdate({
           projectId: input.projectId,
           updateType: 'file-upload',
@@ -293,8 +303,8 @@ export const appRouter = router({
       }),
 
     addUpdate: adminProcedure
-      .input(z.object({ 
-        projectId: z.number(), 
+      .input(z.object({
+        projectId: z.number(),
         message: z.string(),
         fileUrl: z.string().optional(),
       }))
@@ -310,8 +320,7 @@ export const appRouter = router({
           createdBy: ctx.user!.id,
         });
 
-        // Notify client
-        await db.createNotification({
+await db.createNotification({
           userId: project.clientId,
           type: 'project-update',
           title: 'Actualización en tu proyecto',
@@ -327,8 +336,7 @@ export const appRouter = router({
     }),
   }),
 
-  // ==================== PAYMENTS ====================
-  payments: router({
+payments: router({
     create: protectedProcedure
       .input(z.object({
         projectId: z.number(),
@@ -363,8 +371,7 @@ export const appRouter = router({
 
         await db.updatePaymentStatus(input.id, input.status);
 
-        // Notify client
-        if (input.status === 'completed') {
+if (input.status === 'completed') {
           await db.createNotification({
             userId: payment.clientId,
             type: 'payment-received',
@@ -378,8 +385,7 @@ export const appRouter = router({
       }),
   }),
 
-  // ==================== NOTIFICATIONS ====================
-  notifications: router({
+notifications: router({
     getMyNotifications: protectedProcedure.query(async ({ ctx }) => {
       return await db.getUserNotifications(ctx.user!.id);
     }),
@@ -392,10 +398,9 @@ export const appRouter = router({
       }),
   }),
 
-  // ==================== BLOG ====================
-  blog: router({
+blog: router({
     list: publicProcedure.query(async () => {
-      return await db.getBlogArticles(6); // Get latest 6 published articles
+      return await db.getBlogArticles(6);
     }),
 
     getAll: adminProcedure.query(async () => {
@@ -482,8 +487,7 @@ export const appRouter = router({
       }),
   }),
 
-  // ==================== PORTFOLIO ====================
-  portfolio: router({
+portfolio: router({
     getPublic: publicProcedure.query(async () => {
       return await db.getPublicPortfolioItems();
     }),

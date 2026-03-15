@@ -20,7 +20,12 @@ export default function AdminBlog() {
     isPublished: false,
   });
 
-  const articles = trpc.blog.getAll.useQuery();
+  const articles = trpc.blog.getAll.useQuery(undefined, {
+    onError: (err: any) => {
+      console.error("Error fetching articles:", err);
+      toast.error(`Error al cargar artículos: ${err.message}`);
+    },
+  });
   const createArticle = trpc.blog.create.useMutation({
     onSuccess: () => {
       toast.success("Artículo creado exitosamente");
@@ -216,7 +221,7 @@ export default function AdminBlog() {
         </Card>
       )}
 
-      {/* Articles List */}
+      {}
       <div className="space-y-3">
         {articles.isLoading ? (
           <div className="flex justify-center py-8">

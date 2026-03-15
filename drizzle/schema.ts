@@ -1,9 +1,9 @@
-import { 
-  int, 
-  mysqlEnum, 
-  mysqlTable, 
-  text, 
-  timestamp, 
+import {
+  int,
+  mysqlEnum,
+  mysqlTable,
+  text,
+  timestamp,
   varchar,
   decimal,
   boolean,
@@ -11,24 +11,17 @@ import {
 } from "drizzle-orm/mysql-core";
 import { relations, sql } from "drizzle-orm";
 
-/**
- * VIDEXA STUDIO Database Schema
- * Full-stack project management system with authentication, quotes, projects, payments, and notifications
- */
-
-// ==================== USERS & AUTHENTICATION ====================
-
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
   openId: varchar("openId", { length: 64 }).unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }).notNull().unique(),
   phone: varchar("phone", { length: 20 }),
-  password: text("password"), // For email/password auth
+  password: text("password"),
   loginMethod: varchar("loginMethod", { length: 64 }).default("email"),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   company: text("company"),
-  resetToken: text("resetToken"), // Password reset token
+  resetToken: text("resetToken"),
   resetTokenExpires: timestamp('resetTokenExpires'),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -38,8 +31,6 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// ==================== SERVICES ====================
-
 export const services = mysqlTable("services", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -47,7 +38,8 @@ export const services = mysqlTable("services", {
   description: text("description"),
   basePrice: decimal("basePrice", { precision: 10, scale: 2 }).notNull(),
   icon: varchar("icon", { length: 50 }),
-  category: varchar("category", { length: 50 }).notNull(), // motion-edit, motion-graphics, brand-pack, captions, color-grading
+  category: varchar("category", { length: 50 }).notNull(),
+  features: text("features"),
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -55,8 +47,6 @@ export const services = mysqlTable("services", {
 
 export type Service = typeof services.$inferSelect;
 export type InsertService = typeof services.$inferInsert;
-
-// ==================== QUOTES (COTIZACIONES) ====================
 
 export const quotes = mysqlTable("quotes", {
   id: int("id").autoincrement().primaryKey(),
@@ -76,8 +66,6 @@ export const quotes = mysqlTable("quotes", {
 export type Quote = typeof quotes.$inferSelect;
 export type InsertQuote = typeof quotes.$inferInsert;
 
-// ==================== PROJECTS ====================
-
 export const projects = mysqlTable("projects", {
   id: int("id").autoincrement().primaryKey(),
   quoteId: int("quoteId").notNull(),
@@ -87,23 +75,19 @@ export const projects = mysqlTable("projects", {
   description: text("description"),
   status: mysqlEnum("status", ["pending", "in-progress", "completed", "on-hold", "cancelled"]).default("pending").notNull(),
   priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
-  
-  // Project details
-  deliverables: text("deliverables"), // JSON array of deliverables
-  timeline: varchar("timeline", { length: 100 }), // e.g., "48h", "1 week"
-  
-  // File management
-  clientFilesUrl: text("clientFilesUrl"), // S3 URL to uploaded files
-  deliveryFilesUrl: text("deliveryFilesUrl"), // S3 URL to completed files
-  
-  // Tracking
-  startDate: datetime("startDate"),
+
+deliverables: text("deliverables"),
+  timeline: varchar("timeline", { length: 100 }),
+
+clientFilesUrl: text("clientFilesUrl"),
+  deliveryFilesUrl: text("deliveryFilesUrl"),
+
+startDate: datetime("startDate"),
   dueDate: datetime("dueDate"),
   completedDate: datetime("completedDate"),
-  
-  // Team assignment
-  assignedTo: int("assignedTo"), // Admin user ID
-  
+
+assignedTo: int("assignedTo"),
+
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -111,45 +95,39 @@ export const projects = mysqlTable("projects", {
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = typeof projects.$inferInsert;
 
-// ==================== PROJECT UPDATES (REVISION ROUNDS) ====================
-
 export const projectUpdates = mysqlTable("projectUpdates", {
   id: int("id").autoincrement().primaryKey(),
   projectId: int("projectId").notNull(),
   updateType: mysqlEnum("updateType", ["revision-request", "status-change", "file-upload", "comment", "approval"]).notNull(),
   message: text("message"),
-  fileUrl: text("fileUrl"), // S3 URL if applicable
-  createdBy: int("createdBy").notNull(), // User ID
+  fileUrl: text("fileUrl"),
+  createdBy: int("createdBy").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export type ProjectUpdate = typeof projectUpdates.$inferSelect;
 export type InsertProjectUpdate = typeof projectUpdates.$inferInsert;
 
-// ==================== PAYMENTS ====================
-
 export const payments = mysqlTable("payments", {
   id: int("id").autoincrement().primaryKey(),
   projectId: int("projectId").notNull(),
   quoteId: int("quoteId").notNull(),
   clientId: int("clientId").notNull(),
-  
+
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   currency: varchar("currency", { length: 3 }).default("USD").notNull(),
-  
+
   paymentMethod: mysqlEnum("paymentMethod", ["paypal", "stripe", "bank-transfer", "cash"]).notNull(),
   paymentStatus: mysqlEnum("paymentStatus", ["pending", "processing", "completed", "failed", "refunded"]).default("pending").notNull(),
-  
-  // PayPal/Stripe transaction IDs
-  transactionId: varchar("transactionId", { length: 255 }),
+
+transactionId: varchar("transactionId", { length: 255 }),
   paypalOrderId: varchar("paypalOrderId", { length: 255 }),
-  
-  // Invoice tracking
-  invoiceNumber: varchar("invoiceNumber", { length: 50 }).unique(),
-  invoiceUrl: text("invoiceUrl"), // S3 URL to PDF invoice
-  
+
+invoiceNumber: varchar("invoiceNumber", { length: 50 }).unique(),
+  invoiceUrl: text("invoiceUrl"),
+
   notes: text("notes"),
-  
+
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   paidAt: datetime("paidAt"),
@@ -157,8 +135,6 @@ export const payments = mysqlTable("payments", {
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
-
-// ==================== NOTIFICATIONS ====================
 
 export const notifications = mysqlTable("notifications", {
   id: int("id").autoincrement().primaryKey(),
@@ -185,13 +161,11 @@ export const notifications = mysqlTable("notifications", {
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
 
-// ==================== EMAIL LOGS ====================
-
 export const emailLogs = mysqlTable("emailLogs", {
   id: int("id").autoincrement().primaryKey(),
   recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
   subject: varchar("subject", { length: 255 }).notNull(),
-  emailType: varchar("emailType", { length: 50 }).notNull(), // quote-confirmation, project-update, etc.
+  emailType: varchar("emailType", { length: 50 }).notNull(),
   status: mysqlEnum("status", ["sent", "failed", "bounced"]).default("sent").notNull(),
   relatedProjectId: int("relatedProjectId"),
   relatedQuoteId: int("relatedQuoteId"),
@@ -202,17 +176,15 @@ export const emailLogs = mysqlTable("emailLogs", {
 export type EmailLog = typeof emailLogs.$inferSelect;
 export type InsertEmailLog = typeof emailLogs.$inferInsert;
 
-// ==================== BLOG ARTICLES ====================
-
 export const blogArticles = mysqlTable("blogArticles", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
-  category: varchar("category", { length: 50 }).notNull(), // Tutorial, Tendencias, Negocio, etc
+  category: varchar("category", { length: 50 }).notNull(),
   excerpt: text("excerpt"),
   content: text("content").notNull(),
-  thumbnailUrl: text("thumbnailUrl"), // S3 URL
-  readingTime: int("readingTime"), // in minutes
+  thumbnailUrl: text("thumbnailUrl"),
+  readingTime: int("readingTime"),
   authorId: int("authorId").notNull(),
   isPublished: boolean("isPublished").default(false).notNull(),
   publishedAt: timestamp("publishedAt"),
@@ -223,17 +195,15 @@ export const blogArticles = mysqlTable("blogArticles", {
 export type BlogArticle = typeof blogArticles.$inferSelect;
 export type InsertBlogArticle = typeof blogArticles.$inferInsert;
 
-// ==================== PORTFOLIO ITEMS ====================
-
 export const portfolioItems = mysqlTable("portfolioItems", {
   id: int("id").autoincrement().primaryKey(),
   projectId: int("projectId"),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
-  category: varchar("category", { length: 50 }).notNull(), // reel, motion-graphics, brand-pack, captions, promo
-  duration: varchar("duration", { length: 50 }), // e.g., "60s", "30s"
-  thumbnailUrl: text("thumbnailUrl"), // S3 URL
-  videoUrl: text("videoUrl"), // S3 URL or YouTube embed
+  category: varchar("category", { length: 50 }).notNull(),
+  duration: varchar("duration", { length: 50 }),
+  thumbnailUrl: text("thumbnailUrl"),
+  videoUrl: text("videoUrl"),
   clientName: varchar("clientName", { length: 255 }),
   isPublic: boolean("isPublic").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -241,8 +211,6 @@ export const portfolioItems = mysqlTable("portfolioItems", {
 
 export type PortfolioItem = typeof portfolioItems.$inferSelect;
 export type InsertPortfolioItem = typeof portfolioItems.$inferInsert;
-
-// ==================== RELATIONS ====================
 
 export const usersRelations = relations(users, ({ many }) => ({
   quotes: many(quotes),

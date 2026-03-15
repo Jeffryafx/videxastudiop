@@ -10,6 +10,7 @@ import { toast } from "sonner";
 export default function AdminPortfolio() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -65,21 +66,56 @@ export default function AdminPortfolio() {
       clientName: "",
       isPublic: false,
     });
+    setVideoFile(null);
     setEditingId(null);
     setShowForm(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.videoUrl) {
-      toast.error("Completa los campos requeridos");
+    if (!formData.title || (!formData.videoUrl && !videoFile)) {
+      toast.error("Completa los campos requeridos (título y video)");
       return;
     }
 
-    if (editingId) {
-      updateItem.mutate({ id: editingId, ...formData });
+    if (videoFile) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = (event.target?.result as string).split(",")[1];
+
+        fetch("/api/upload-video", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: videoFile.name,
+            data: base64,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data.url) {
+              throw new Error("No se recibió URL del video");
+            }
+            const videoUrl = data.url;
+
+            if (editingId) {
+              updateItem.mutate({ id: editingId, ...formData, videoUrl });
+            } else {
+              createItem.mutate({ ...formData, videoUrl } as any);
+            }
+          })
+          .catch((err) => {
+            toast.error(`Error al subir video: ${err.message}`);
+            console.error(err);
+          });
+      };
+      reader.readAsDataURL(videoFile);
     } else {
-      createItem.mutate(formData as any);
+      if (editingId) {
+        updateItem.mutate({ id: editingId, ...formData });
+      } else {
+        createItem.mutate(formData as any);
+      }
     }
   };
 
@@ -94,6 +130,7 @@ export default function AdminPortfolio() {
       clientName: item.clientName || "",
       isPublic: item.isPublic,
     });
+    setVideoFile(null);
     setEditingId(item.id);
     setShowForm(true);
   };
@@ -180,14 +217,30 @@ export default function AdminPortfolio() {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-300">URL del Video (S3 o YouTube)</label>
-                <Input
-                  value={formData.videoUrl}
-                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                  placeholder="https://..."
-                  className="bg-gray-800 border-gray-700 text-white"
-                  required
-                />
+                <label className="text-sm font-medium text-gray-300">Video</label>
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        setVideoFile(e.target.files[0]);
+                        toast.success(`Video seleccionado: ${e.target.files[0].name}`);
+                      }
+                    }}
+                    className="block w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm file:bg-gray-700 file:text-gray-300 file:border-0 file:rounded file:px-3 file:py-1 file:cursor-pointer"
+                  />
+                  {videoFile && (
+                    <div className="text-sm text-green-400">
+                      ✅ Archivo: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </div>
+                  )}
+                  {!videoFile && formData.videoUrl && (
+                    <div className="text-sm text-yellow-400">
+                      📹 URL anterior: {formData.videoUrl}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -195,7 +248,7 @@ export default function AdminPortfolio() {
                 <Input
                   value={formData.thumbnailUrl}
                   onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                  placeholder="https://..."
+                  placeholder="https://s3.amazonaws.com/bucket/thumbnail.jpg"
                   className="bg-gray-800 border-gray-700 text-white"
                 />
               </div>
@@ -229,7 +282,7 @@ export default function AdminPortfolio() {
         </Card>
       )}
 
-      {/* Portfolio Items List */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {items.isLoading ? (
           <div className="col-span-full flex justify-center py-8">

@@ -1,7 +1,4 @@
-/*
- * VIDEXA STUDIO — Scroll to Top Button
- * Design: Floating emerald button, appears after scrolling 400px
- */
+
 
 import { useState, useEffect } from "react";
 import { ChevronUp } from "lucide-react";

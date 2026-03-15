@@ -1,8 +1,4 @@
-/*
- * VIDEXA STUDIO — Navbar Component
- * Design: Glassmorphism dark surface, emerald CTA, sliding underline nav links
- * backdrop-filter: blur(12px) on #0E1220 base
- */
+
 
 import { useState, useEffect } from "react";
 import { Menu, X, LogOut, User, LayoutDashboard } from "lucide-react";
@@ -58,13 +54,13 @@ export default function Navbar() {
       }`}
     >
       <div className="container flex items-center justify-between">
-        {/* Logo */}
+        {}
         <a
           href="#inicio"
           onClick={(e) => { e.preventDefault(); handleNavClick("#inicio"); }}
           className="flex items-center gap-2.5 group"
         >
-          {/* Logo mark */}
+          {}
           <div className="relative w-8 h-8">
             <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-[#00E5A0] to-[#22D3EE] opacity-90 group-hover:opacity-100 transition-opacity" />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -82,7 +78,7 @@ export default function Navbar() {
           </span>
         </a>
 
-        {/* Desktop nav links */}
+        {}
         <div className="hidden md:flex items-center gap-7">
           {navLinks.map((link) => (
             <a
@@ -96,10 +92,10 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Auth & CTA buttons */}
+        {}
         <div className="hidden md:flex items-center gap-3">
           {user ? (
-            // Usuario logueado
+
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -109,10 +105,10 @@ export default function Navbar() {
                 <span className="font-medium text-sm">{user.name || user.email}</span>
               </button>
 
-              {/* Dropdown menu */}
+              {}
               {userMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-[#0E1220] border border-[#252D42] rounded-lg shadow-lg overflow-hidden z-50">
-                  {/* User info */}
+                  {}
                   <div className="px-4 py-3 border-b border-[#252D42]">
                     <p className="text-xs text-[#6B7494]">Logueado como</p>
                     <p className="text-sm font-medium text-[#EEF0F7]">{user.name || user.email}</p>
@@ -122,7 +118,7 @@ export default function Navbar() {
                     </p>
                   </div>
 
-                  {/* Menu items */}
+                  {}
                   <button
                     onClick={handleDashboard}
                     className="w-full px-4 py-2.5 text-left flex items-center gap-2 text-[#6B7494] hover:text-[#EEF0F7] hover:bg-[#252D42] transition-colors text-sm"
@@ -131,7 +127,7 @@ export default function Navbar() {
                     {user.role === "admin" ? "Panel Admin" : "Mi Dashboard"}
                   </button>
 
-                  {/* Logout */}
+                  {}
                   <button
                     onClick={handleLogout}
                     className="w-full px-4 py-2.5 text-left flex items-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-sm border-t border-[#252D42]"
@@ -143,7 +139,7 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            // Usuario no logueado
+
             <>
               <button
                 onClick={() => setLocation("/login")}
@@ -167,7 +163,7 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile menu toggle */}
+        {}
         <button
           className="md:hidden text-[#6B7494] hover:text-[#EEF0F7] transition-colors p-1"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -177,7 +173,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {}
       {mobileOpen && (
         <div className="md:hidden border-t border-[#252D42] mt-3">
           <div className="container py-4 flex flex-col gap-4">
@@ -192,7 +188,7 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
-            
+
             {user ? (
               <div className="flex flex-col gap-2 pt-2 border-t border-[#252D42]">
                 <div className="px-3 py-2 bg-[#00E5A0]/10 border border-[#00E5A0]/30 rounded-lg">
@@ -231,7 +227,7 @@ export default function Navbar() {
                 </button>
               </div>
             )}
-            
+
             <button
               onClick={() => handleNavClick("#contacto")}
               className="btn-primary text-sm mt-2 w-full"

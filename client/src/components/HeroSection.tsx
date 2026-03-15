@@ -1,7 +1,4 @@
-/*
- * VIDEXA STUDIO — Hero Section
- * Design: Asymmetric left-weighted text + right floating mockup card
- */
+
 
 import { Play, Zap, Award } from "lucide-react";
 import { useCountUp } from "../hooks/useCountUp";
@@ -38,7 +35,7 @@ export default function HeroSection() {
       <div
         className="absolute inset-0 opacity-40"
         style={{
-          backgroundImage: "url(https://d2xsxph8kpxj0f.cloudfront.net/310519663438801757/7KKxXnXYeQKbj9epp3KDoh/videxa-hero-bg-VoSeFdbuDgrRjxw343cMfA.webp)",
+          backgroundImage: "url(data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -172,9 +169,8 @@ export default function HeroSection() {
                 }}
               >
                 <img
-                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663438801757/7KKxXnXYeQKbj9epp3KDoh/videxa-mockup-card-SxaD7Kq4bMQzS9VXHHWrcv.webp"
                   alt="Video editing interface mockup"
-                  className="w-full h-auto"
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663438801757/7KKxXnXYeQKbj9epp3KDoh/videxa-mockup-card-SxaD7Kq4bMQzS9VXHHWrcv.webp" 
                   style={{ display: "block" }}
                 />
                 <div
@@ -207,9 +203,9 @@ export default function HeroSection() {
                   boxShadow: "0 8px 30px rgba(124,92,252,0.2)",
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#7C5CFC] to-[#22D3EE] flex items-center justify-center">
-                    <Zap size={12} className="text-white" />
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden border border-[#7C5CFC]/40 flex-shrink-0">
+                  
                   </div>
                   <div>
                     <div className="text-[#EEF0F7] text-xs font-bold" style={{ fontFamily: "'Outfit', sans-serif" }}>

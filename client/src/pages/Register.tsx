@@ -70,7 +70,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#080B12] to-[#0a1628] p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#00E5A0] to-[#22D3EE] flex items-center justify-center">
@@ -81,7 +81,7 @@ export default function Register() {
           <p className="text-gray-400">Crea tu cuenta</p>
         </div>
 
-        {/* Register Card */}
+        {}
         <Card className="border-gray-700 bg-gray-900/50 backdrop-blur">
           <CardHeader>
             <CardTitle className="text-white">Registrarse</CardTitle>
@@ -89,7 +89,7 @@ export default function Register() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Error Message */}
+              {}
               {error && (
                 <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-700/50 rounded-lg">
                   <AlertCircle className="w-4 h-4 text-red-500" />
@@ -97,7 +97,7 @@ export default function Register() {
                 </div>
               )}
 
-              {/* Name Field */}
+              {}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-300">Nombre Completo</label>
                 <Input
@@ -110,7 +110,7 @@ export default function Register() {
                 />
               </div>
 
-              {/* Email Field */}
+              {}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-300">Email</label>
                 <Input
@@ -123,7 +123,7 @@ export default function Register() {
                 />
               </div>
 
-              {/* Password Field */}
+              {}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-300">Contraseña</label>
                 <Input
@@ -137,7 +137,7 @@ export default function Register() {
                 <p className="text-xs text-gray-500">Mínimo 6 caracteres</p>
               </div>
 
-              {/* Confirm Password Field */}
+              {}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-300">Confirmar Contraseña</label>
                 <Input
@@ -150,7 +150,7 @@ export default function Register() {
                 />
               </div>
 
-              {/* Submit Button */}
+              {}
               <Button
                 type="submit"
                 disabled={registerMutation.isPending}
@@ -167,7 +167,7 @@ export default function Register() {
               </Button>
             </form>
 
-            {/* Login Link */}
+            {}
             <div className="mt-6 text-center">
               <p className="text-gray-400">
                 ¿Ya tienes cuenta?{" "}
@@ -180,7 +180,7 @@ export default function Register() {
               </p>
             </div>
 
-            {/* Back to Home */}
+            {}
             <div className="mt-4 text-center">
               <button
                 onClick={() => setLocation("/")}

@@ -1,10 +1,4 @@
-/*
- * VIDEXA STUDIO — Contact / Quote Section
- * Design: Split panel — left info + right form
- * Form: dark inputs with emerald focus glow
- */
-
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Mail, Instagram, MessageCircle, Send, CheckCircle, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -17,6 +11,14 @@ export default function ContactSection() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+
+  const servicesQuery = trpc.services.list.useQuery();
+  const services = servicesQuery.data || [];
+
+  const selectedService = useMemo(() => {
+    if (!formData.service) return null;
+    return services.find((s: any) => s.id === parseInt(formData.service));
+  }, [formData.service, services]);
 
   const createQuoteMutation = trpc.quotes.create.useMutation({
     onSuccess: () => {
@@ -50,10 +52,7 @@ export default function ContactSection() {
       className="relative py-24 overflow-hidden"
       style={{ background: "#0E1220" }}
     >
-      {/* Dot grid */}
       <div className="absolute inset-0 dot-grid opacity-30" />
-
-      {/* Glow orb */}
       <div
         className="glow-orb"
         style={{
@@ -66,7 +65,7 @@ export default function ContactSection() {
       />
 
       <div className="container relative z-10">
-        {/* Header */}
+        {}
         <div className="text-center mb-16 reveal">
           <span className="section-label block mb-3">Hablemos</span>
           <h2
@@ -89,7 +88,7 @@ export default function ContactSection() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Left: Contact info */}
+          {}
           <div className="reveal-left flex flex-col gap-8">
             <div>
               <h3
@@ -111,12 +110,12 @@ export default function ContactSection() {
               </p>
             </div>
 
-            {/* Contact channels */}
+            {}
             <div className="flex flex-col gap-4">
               {[
-                { icon: Mail, label: "Email", value: "hola@videxa.studio", color: "#00E5A0" },
+                { icon: Mail, label: "Email", value: "jeffry.editor06@gmail.com", color: "#00E5A0" },
                 { icon: Instagram, label: "Instagram", value: "@videxa.studio", color: "#7C5CFC" },
-                { icon: MessageCircle, label: "WhatsApp", value: "+57 300 000 0000", color: "#22D3EE" },
+                { icon: MessageCircle, label: "WhatsApp", value: "+57 300 649 3668", color: "#22D3EE" },
               ].map((contact) => {
                 const Icon = contact.icon;
                 return (
@@ -150,7 +149,7 @@ export default function ContactSection() {
               })}
             </div>
 
-            {/* Response time badge */}
+            {}
             <div
               className="flex items-center gap-3 p-4 rounded-xl"
               style={{ background: "rgba(0,229,160,0.06)", border: "1px solid rgba(0,229,160,0.15)" }}
@@ -166,7 +165,7 @@ export default function ContactSection() {
             </div>
           </div>
 
-          {/* Right: Form */}
+          {}
           <div className="reveal-right">
             <div
               className="p-8 rounded-2xl border border-[#252D42]"
@@ -204,7 +203,7 @@ export default function ContactSection() {
                       </label>
                       <input
                         type="text"
-                        placeholder="Jeffry Afa"
+                        placeholder="Nombre Completo"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="videxa-input"
@@ -242,13 +241,26 @@ export default function ContactSection() {
                       className="videxa-input"
                       required
                       style={{ appearance: "none" }}
+                      disabled={servicesQuery.isLoading}
                     >
-                      <option value="" disabled>Selecciona un servicio...</option>
-                      <option value="1">Motion Graphics</option>
-                      <option value="2">Edición de Video</option>
-                      <option value="3">Animación 3D</option>
-                      <option value="4">Color Grading</option>
+                      <option value="" disabled>{servicesQuery.isLoading ? "Cargando..." : "Selecciona un servicio..."}</option>
+                      {services.map((service: any) => (
+                        <option key={service.id} value={service.id.toString()}>
+                          {service.name}
+                        </option>
+                      ))}
                     </select>
+                    {selectedService && (
+                      <div
+                        className="p-3 rounded-lg flex items-center justify-between"
+                        style={{ background: "rgba(0, 229, 160, 0.1)", border: "1px solid rgba(0, 229, 160, 0.3)" }}
+                      >
+                        <span className="text-[#6B7494] text-sm">{selectedService.description}</span>
+                        <span className="text-[#00E5A0] font-bold text-lg ml-4 whitespace-nowrap">
+                          ${selectedService.basePrice}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-1.5">

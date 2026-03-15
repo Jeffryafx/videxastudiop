@@ -1,82 +1,39 @@
-/*
- * VIDEXA STUDIO — Portfolio Section
- * Design: Masonry-style grid with category filters, dark cards with hover overlay
- */
 
 import { useState } from "react";
-import { Play, ExternalLink } from "lucide-react";
+import { Play, ExternalLink, Loader2, X } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
-const categories = ["Todos", "Reels", "Motion Graphics", "Brand Pack", "Captions"];
+const categories = ["Todos", "reel", "motion-graphics", "brand-pack", "captions"];
 
-const portfolioItems = [
-  {
-    id: 1,
-    title: "Coach de Negocios — Reel Viral",
-    category: "Reels",
-    type: "Reel · 60s",
-    color: "#00E5A0",
-    bg: "linear-gradient(135deg, #0E1220 0%, #1C2335 100%)",
-    accent: "rgba(0,229,160,0.15)",
-    span: "col-span-1 row-span-1",
-  },
-  {
-    id: 2,
-    title: "Marca de Moda — Motion Graphics",
-    category: "Motion Graphics",
-    type: "Motion · 30s",
-    color: "#7C5CFC",
-    bg: "linear-gradient(135deg, #0E1220 0%, #1C2335 100%)",
-    accent: "rgba(124,92,252,0.15)",
-    span: "col-span-1 row-span-2",
-  },
-  {
-    id: 3,
-    title: "Podcast — Captions Animados",
-    category: "Captions",
-    type: "Captions · 45s",
-    color: "#22D3EE",
-    bg: "linear-gradient(135deg, #0E1220 0%, #1C2335 100%)",
-    accent: "rgba(34,211,238,0.15)",
-    span: "col-span-1 row-span-1",
-  },
-  {
-    id: 4,
-    title: "Startup Tech — Brand Pack",
-    category: "Brand Pack",
-    type: "Brand · Full",
-    color: "#00E5A0",
-    bg: "linear-gradient(135deg, #0E1220 0%, #1C2335 100%)",
-    accent: "rgba(0,229,160,0.15)",
-    span: "col-span-2 row-span-1",
-  },
-  {
-    id: 5,
-    title: "Influencer — Reel Lifestyle",
-    category: "Reels",
-    type: "Reel · 90s",
-    color: "#7C5CFC",
-    bg: "linear-gradient(135deg, #0E1220 0%, #1C2335 100%)",
-    accent: "rgba(124,92,252,0.15)",
-    span: "col-span-1 row-span-1",
-  },
-  {
-    id: 6,
-    title: "Restaurante — Promo Video",
-    category: "Motion Graphics",
-    type: "Promo · 60s",
-    color: "#22D3EE",
-    bg: "linear-gradient(135deg, #0E1220 0%, #1C2335 100%)",
-    accent: "rgba(34,211,238,0.15)",
-    span: "col-span-1 row-span-1",
-  },
-];
+const categoryLabels: Record<string, string> = {
+  Todos: "Todos",
+  reel: "Reels",
+  "motion-graphics": "Motion Graphics",
+  "brand-pack": "Brand Pack",
+  captions: "Captions",
+};
+
+const categoryColors: Record<string, { color: string; accent: string }> = {
+  reel: { color: "#00E5A0", accent: "rgba(0,229,160,0.15)" },
+  "motion-graphics": { color: "#7C5CFC", accent: "rgba(124,92,252,0.15)" },
+  captions: { color: "#22D3EE", accent: "rgba(34,211,238,0.15)" },
+  "brand-pack": { color: "#00E5A0", accent: "rgba(0,229,160,0.15)" },
+  promo: { color: "#22D3EE", accent: "rgba(34,211,238,0.15)" },
+};
 
 export default function PortfolioSection() {
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const portfolioQuery = trpc.portfolio.getPublic.useQuery();
+  const items = portfolioQuery.data || [];
+
+  const getColorForCategory = (category: string) => {
+    return categoryColors[category] || categoryColors.reel;
+  };
 
   const filtered = activeCategory === "Todos"
-    ? portfolioItems
-    : portfolioItems.filter((item) => item.category === activeCategory);
+    ? items
+    : items.filter((item: any) => item.category === activeCategory);
 
   return (
     <section
@@ -84,11 +41,11 @@ export default function PortfolioSection() {
       className="relative py-24 overflow-hidden"
       style={{ background: "#0E1220" }}
     >
-      {/* Background image */}
+      {}
       <div
         className="absolute inset-0 opacity-20"
         style={{
-          backgroundImage: "url(https://d2xsxph8kpxj0f.cloudfront.net/310519663438801757/7KKxXnXYeQKbj9epp3KDoh/videxa-portfolio-bg-Pi3zDHXcXDkDi5U8EaioSA.webp)",
+          backgroundImage: "url(data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -96,7 +53,7 @@ export default function PortfolioSection() {
       <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, #0E1220 0%, transparent 20%, transparent 80%, #0E1220 100%)" }} />
 
       <div className="container relative z-10">
-        {/* Header */}
+        {}
         <div className="text-center mb-12 reveal">
           <span className="section-label block mb-3">Nuestro trabajo</span>
           <h2
@@ -118,7 +75,7 @@ export default function PortfolioSection() {
           </p>
         </div>
 
-        {/* Category filters */}
+        {}
         <div className="flex flex-wrap justify-center gap-2 mb-10 reveal">
           {categories.map((cat) => (
             <button
@@ -134,91 +91,137 @@ export default function PortfolioSection() {
                 border: activeCategory === cat ? "none" : "1px solid #252D42",
               }}
             >
-              {cat}
+              {categoryLabels[cat] || cat}
             </button>
           ))}
         </div>
 
-        {/* Portfolio grid */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4" style={{ gridAutoRows: '200px' }}>
-          {filtered.map((item, index) => (
-            <div
-              key={item.id}
-              className={`reveal group relative rounded-2xl overflow-hidden cursor-pointer ${item.span}`}
-              style={{
-                background: item.bg,
-                border: "1px solid #252D42",
-                transitionDelay: `${index * 0.08}s`,
-              }}
-            >
-              {/* Accent glow */}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ background: `radial-gradient(ellipse at center, ${item.accent} 0%, transparent 70%)` }}
-              />
-
-              {/* Border glow on hover */}
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ boxShadow: `inset 0 0 0 1px ${item.color}40` }}
-              />
-
-              {/* Play button */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center"
-                  style={{ background: `${item.color}20`, border: `2px solid ${item.color}60`, backdropFilter: "blur(8px)" }}
-                >
-                  <Play size={20} fill={item.color} style={{ color: item.color, marginLeft: "2px" }} />
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-4" style={{ background: "linear-gradient(to top, rgba(8,11,18,0.9) 0%, transparent 100%)" }}>
-                <div className="flex items-end justify-between">
-                  <div>
-                    <span
-                      className="text-xs font-semibold mb-1 block"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: item.color, letterSpacing: "0.06em", textTransform: "uppercase" }}
-                    >
-                      {item.type}
-                    </span>
-                    <h3
-                      className="text-sm font-bold text-[#EEF0F7] leading-tight"
-                      style={{ fontFamily: "'Outfit', sans-serif" }}
-                    >
-                      {item.title}
-                    </h3>
-                  </div>
-                  <ExternalLink
-                    size={16}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 ml-2"
-                    style={{ color: item.color }}
-                  />
-                </div>
-              </div>
-
-              {/* Decorative waveform */}
-              <div className="absolute top-4 right-4 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
-                <svg width="60" height="30" viewBox="0 0 60 30">
-                  {[4, 12, 20, 28, 36, 44, 52].map((x, i) => (
-                    <rect
-                      key={x}
-                      x={x}
-                      y={15 - [8, 14, 10, 15, 7, 12, 9][i]}
-                      width="4"
-                      height={[16, 28, 20, 30, 14, 24, 18][i]}
-                      rx="2"
-                      fill={item.color}
-                    />
-                  ))}
-                </svg>
-              </div>
+          {portfolioQuery.isLoading ? (
+            <div className="col-span-3 flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-[#00E5A0]" />
             </div>
-          ))}
+          ) : filtered.length === 0 ? (
+            <div className="col-span-3 text-center py-12 text-[#6B7494]">
+              No hay proyectos disponibles en esta categoría
+            </div>
+          ) : (
+            filtered.map((item: any, index: number) => {
+              const { color, accent } = getColorForCategory(item.category);
+              return (
+                <div
+                  key={item.id}
+                  className="reveal group relative rounded-2xl overflow-hidden cursor-pointer"
+                  onClick={() => setSelectedVideo(item)}
+                  style={{
+                    background: "linear-gradient(135deg, #0E1220 0%, #1C2335 100%)",
+                    border: "1px solid #252D42",
+                    transitionDelay: `${index * 0.08}s`,
+                  }}
+                >
+                  {}
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ background: `radial-gradient(ellipse at center, ${accent} 0%, transparent 70%)` }}
+                  />
+
+                  {}
+                  <div
+                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ boxShadow: `inset 0 0 0 1px ${color}40` }}
+                  />
+
+                  {}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div
+                      className="w-14 h-14 rounded-full flex items-center justify-center"
+                      style={{ background: `${color}20`, border: `2px solid ${color}60`, backdropFilter: "blur(8px)" }}
+                    >
+                      <Play size={20} fill={color} style={{ color: color, marginLeft: "2px" }} />
+                    </div>
+                  </div>
+
+                  {}
+                  <div className="absolute bottom-0 left-0 right-0 p-4" style={{ background: "linear-gradient(to top, rgba(8,11,18,0.9) 0%, transparent 100%)" }}>
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <span
+                          className="text-xs font-semibold mb-1 block"
+                          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: color, letterSpacing: "0.06em", textTransform: "uppercase" }}
+                        >
+                          {item.category.replace(/-/g, " ")} · {item.duration || "60s"}
+                        </span>
+                        <h3
+                          className="text-sm font-bold text-[#EEF0F7] leading-tight"
+                          style={{ fontFamily: "'Outfit', sans-serif" }}
+                        >
+                          {item.title}
+                        </h3>
+                      </div>
+                      <ExternalLink
+                        size={16}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 ml-2"
+                        style={{ color: color }}
+                      />
+                    </div>
+                  </div>
+
+                  {}
+                  <div className="absolute top-4 right-4 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+                    <svg width="60" height="30" viewBox="0 0 60 30">
+                      {[4, 12, 20, 28, 36, 44, 52].map((x, i) => (
+                        <rect
+                          key={x}
+                          x={x}
+                          y={15 - [8, 14, 10, 15, 7, 12, 9][i]}
+                          width="4"
+                          height={[16, 28, 20, 30, 14, 24, 18][i]}
+                          rx="2"
+                          fill={color}
+                        />
+                      ))}
+                    </svg>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
 
-        {/* CTA */}
+        {selectedVideo && (
+          <div
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setSelectedVideo(null)}
+          >
+            <div
+              className="relative w-full max-w-4xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedVideo(null)}
+                className="absolute -top-10 right-0 text-white hover:text-gray-300 z-10"
+              >
+                <X size={24} />
+              </button>
+              <video
+                src={selectedVideo.videoUrl}
+                controls
+                autoPlay
+                className="w-full rounded-lg"
+                style={{ maxHeight: "80vh", objectFit: "contain" }}
+              />
+              <div className="mt-4 text-center">
+                <h3 className="text-xl font-bold text-white">{selectedVideo.title}</h3>
+                {selectedVideo.clientName && (
+                  <p className="text-gray-400 mt-2">{selectedVideo.clientName}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {}
         <div className="text-center mt-12 reveal">
           <p className="text-[#6B7494] mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Mas de 120 proyectos completados
