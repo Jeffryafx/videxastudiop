@@ -24,10 +24,10 @@ function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] }
     role: "user",
     company: null,
     resetToken: null,
-    resetTokenExpires: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    lastSignedIn: new Date().toISOString(),
+    resetTokenExpires: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    createdAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    lastSignedIn: new Date().toISOString().slice(0, 19).replace('T', ' '),
   };
 
   const ctx: TrpcContext = {

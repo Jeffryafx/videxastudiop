@@ -71,8 +71,9 @@ export async function upsertUser(user: Partial<InsertUser> & { openId: string })
     textFields.forEach(assignNullable);
 
     if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = new Date().toISOString();
-      updateSet.lastSignedIn = new Date().toISOString();
+      const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      values.lastSignedIn = timestamp;
+      updateSet.lastSignedIn = timestamp;
     }
     if (user.role !== undefined) {
       values.role = user.role;
@@ -83,11 +84,11 @@ export async function upsertUser(user: Partial<InsertUser> & { openId: string })
     }
 
     if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date().toISOString();
+      values.lastSignedIn = new Date().toISOString().slice(0, 19).replace('T', ' ');
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date().toISOString();
+      updateSet.lastSignedIn = new Date().toISOString().slice(0, 19).replace('T', ' ');
     }
 
 await db.insert(users).values(values as InsertUser).onDuplicateKeyUpdate({
@@ -133,7 +134,7 @@ export async function createUser(data: any) {
     name: data.name,
     role: data.role || 'user',
     loginMethod: data.loginMethod || 'email',
-    lastSignedIn: new Date().toISOString(),
+    lastSignedIn: new Date().toISOString().slice(0, 19).replace('T', ' '),
   });
   return result;
 }
@@ -141,7 +142,7 @@ export async function createUser(data: any) {
 export async function updateUserLastSignedIn(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.update(users).set({ lastSignedIn: new Date().toISOString() }).where(eq(users.id, id));
+  return await db.update(users).set({ lastSignedIn: new Date().toISOString().slice(0, 19).replace('T', ' ') }).where(eq(users.id, id));
 }
 
 export async function updateUserRole(id: number, role: 'user' | 'admin') {
