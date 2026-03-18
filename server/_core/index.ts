@@ -5,7 +5,6 @@ import net from "net";
 import fs from "fs";
 import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -35,8 +34,6 @@ async function startServer() {
 
   app.use(express.json({ limit: "500mb" }));
   app.use(express.urlencoded({ limit: "500mb", extended: true }));
-
-  registerOAuthRoutes(app);
 
   app.post("/api/upload-video", (req, res) => {
     try {
