@@ -210,13 +210,17 @@ export async function getQuoteById(id: number) {
 export async function getClientQuotes(clientId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(quotes).where(eq(quotes.clientId, clientId)).orderBy(desc(quotes.createdAt));
+  const result = await db.select().from(quotes).where(eq(quotes.clientId, clientId)).orderBy(desc(quotes.createdAt));
+  console.log('[DB] getClientQuotes:', { clientId, resultLength: result.length, result });
+  return result;
 }
 
 export async function getAllQuotes() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(quotes).orderBy(desc(quotes.createdAt));
+  const result = await db.select().from(quotes).orderBy(desc(quotes.createdAt));
+  console.log('[DB] getAllQuotes:', { resultLength: result.length, result });
+  return result;
 }
 
 export async function updateQuoteStatus(id: number, status: string) {
@@ -242,13 +246,17 @@ export async function getProjectById(id: number) {
 export async function getClientProjects(clientId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(projects).where(eq(projects.clientId, clientId)).orderBy(desc(projects.createdAt));
+  const result = await db.select().from(projects).where(eq(projects.clientId, clientId)).orderBy(desc(projects.createdAt));
+  console.log('[DB] getClientProjects:', { clientId, resultLength: result.length, result });
+  return result;
 }
 
 export async function getAllProjects() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(projects).orderBy(desc(projects.createdAt));
+  const result = await db.select().from(projects).orderBy(desc(projects.createdAt));
+  console.log('[DB] getAllProjects:', { resultLength: result.length, result });
+  return result;
 }
 
 export async function updateProjectStatus(id: number, status: string) {

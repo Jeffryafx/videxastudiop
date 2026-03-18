@@ -20,9 +20,13 @@ const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.use
     enabled: !!user,
   });
 
+  console.log('[ClientDashboard] Mis cotizaciones:', { myQuotes, loading: quotesLoading });
+
   const { data: myProjects, isLoading: projectsLoading } = trpc.projects.getMyProjects.useQuery(undefined, {
     enabled: !!user,
   });
+
+  console.log('[ClientDashboard] Mis proyectos:', { myProjects, loading: projectsLoading });
 
   const { data: notifications } = trpc.notifications.getMyNotifications.useQuery(undefined, {
     enabled: !!user,
