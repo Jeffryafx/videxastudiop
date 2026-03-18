@@ -31,7 +31,7 @@ const { data: quotes, isLoading: quotesLoading, refetch: refetchQuotes } = trpc.
     enabled: user?.role === "admin" && !authLoading,
   });
 
-  const { data: projects, isLoading: projectsLoading } = trpc.projects.list.useQuery(undefined, {
+  const { data: projects, isLoading: projectsLoading, refetch: refetchProjects } = trpc.projects.list.useQuery(undefined, {
     enabled: user?.role === "admin" && !authLoading,
   });
 
@@ -48,6 +48,7 @@ const updateQuoteStatus = trpc.quotes.updateStatus.useMutation({
   const updateProjectStatus = trpc.projects.updateStatus.useMutation({
     onSuccess: () => {
       toast.success("Estado del proyecto actualizado");
+      refetchProjects();
     },
     onError: (err) => {
       toast.error(err.message);

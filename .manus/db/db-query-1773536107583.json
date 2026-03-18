@@ -1,9 +1,0 @@
-{
-  "query": "INSERT INTO users (openId, email, password, name, role, loginMethod, createdAt, updatedAt, lastSignedIn) VALUES ('admin-videxa-studio', 'admin@videxa.com', '$2b$10$ENGOaWLjHiTHiBjwQ7Dds.jg2b7Rpd8Uz9v8uKdMvnm9jmDO.RtRO', 'Admin Videxa', 'admin', 'email', NOW(), NOW(), NOW()) ON DUPLICATE KEY UPDATE email='admin@videxa.com';",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2UMer9ff5r4YoCm.root --database 7KKxXnXYeQKbj9epp3KDoh --execute INSERT INTO users (openId, email, password, name, role, loginMethod, createdAt, updatedAt, lastSignedIn) VALUES ('admin-videxa-studio', 'admin@videxa.com', '$2b$10$ENGOaWLjHiTHiBjwQ7Dds.jg2b7Rpd8Uz9v8uKdMvnm9jmDO.RtRO', 'Admin Videxa', 'admin', 'email', NOW(), NOW(), NOW()) ON DUPLICATE KEY UPDATE email='admin@videxa.com';",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 405
-}
