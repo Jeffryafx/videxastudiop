@@ -76,7 +76,7 @@ export default function Footer() {
               className="text-[#6B7494] text-sm leading-relaxed max-w-xs"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
-              Videos que paran el scroll y convierten seguidores en clientes. Edicion profesional desde Colombia para el mundo.
+              Videos que paran el scroll y convierten seguidores en clientes. Edición profesional desde Colombia para el mundo.
             </p>
             {}
             <div className="flex gap-3 mt-2">

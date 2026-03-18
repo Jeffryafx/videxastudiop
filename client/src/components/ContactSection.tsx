@@ -83,7 +83,7 @@ export default function ContactSection() {
             className="text-[#6B7494] mt-4 max-w-lg mx-auto"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "1rem", lineHeight: 1.7 }}
           >
-            Cuentanos sobre tu proyecto y te respondemos en menos de 24 horas.
+            Cuéntanos sobre tu proyecto y te respondemos en menos de 24 horas.
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export default function ContactSection() {
                 className="text-[#6B7494] leading-relaxed"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
-                Estamos disponibles para proyectos de cualquier tamano. Desde un reel hasta un paquete mensual completo.
+                Estamos disponibles para proyectos de cualquier tamaño. Desde un reel hasta un paquete mensual completo.
               </p>
             </div>
 
@@ -271,7 +271,7 @@ export default function ContactSection() {
                       Mensaje
                     </label>
                     <textarea
-                      placeholder="Cuentanos sobre tu proyecto, plataforma objetivo, referencias de estilo..."
+                      placeholder="Cuéntanos sobre tu proyecto, plataforma objetivo, referencias de estilo..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       className="videxa-input resize-none"
@@ -293,7 +293,7 @@ export default function ContactSection() {
                     ) : (
                       <>
                         <Send size={16} />
-                        Enviar cotizacion
+                        Enviar cotización
                       </>
                     )}
                   </button>

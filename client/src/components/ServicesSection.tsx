@@ -103,7 +103,7 @@ export default function ServicesSection() {
             className="text-[#6B7494] mt-4 max-w-xl mx-auto"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "1rem", lineHeight: 1.7 }}
           >
-            Edicion de video de alto impacto para que tu contenido destaque en cualquier plataforma.
+            Edición de video de alto impacto para que tu contenido destaque en cualquier plataforma.
           </p>
         </div>
 

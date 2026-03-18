@@ -254,7 +254,7 @@ export default function PortfolioSection() {
         {}
         <div className="text-center mt-12 reveal">
           <p className="text-[#6B7494] mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            Mas de 120 proyectos completados
+            Más de 120 proyectos completados
           </p>
           <button
             onClick={() => {

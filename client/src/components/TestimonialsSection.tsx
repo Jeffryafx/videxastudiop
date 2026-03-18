@@ -9,7 +9,7 @@ const testimonials = [
     avatar: "MG",
     avatarColor: "#00E5A0",
     rating: 5,
-    text: "Videxa Studio transformo mi contenido completamente. Mis reels ahora tienen un nivel cinematografico que mis seguidores aman. El engagement subio un 300%.",
+    text: "Videxa Studio transformó mi contenido completamente. Mis reels ahora tienen un nivel cinematográfico que mis seguidores aman. El engagement subió un 300%.",
     delay: "0s",
   },
   {

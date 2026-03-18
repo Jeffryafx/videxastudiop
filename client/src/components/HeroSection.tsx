@@ -73,7 +73,7 @@ export default function HeroSection() {
             <div className="animate-fade-in inline-flex items-center gap-2 self-start" style={{ animationDelay: "0.1s" }}>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#252D42] bg-[#1C2335]/60">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#00E5A0] animate-pulse" />
-                <span className="section-label">Edicion profesional · Colombia</span>
+                <span className="section-label">Edición profesional · Colombia</span>
               </div>
             </div>
 
@@ -112,7 +112,7 @@ export default function HeroSection() {
                 animationDelay: "0.35s",
               }}
             >
-              Motion graphics, captions animados y edicion de alto impacto para coaches, marcas y creadores.
+              Motion graphics, captions animados y edición de alto impacto para coaches, marcas y creadores.
             </p>
 
             <div className="animate-fade-in flex flex-wrap gap-2" style={{ animationDelay: "0.45s" }}>
@@ -146,7 +146,7 @@ export default function HeroSection() {
 
             <div className="animate-fade-in mt-4 flex gap-8 pt-6 border-t border-[#252D42]" style={{ animationDelay: "0.7s" }}>
               <StatItem end={120} suffix="+" label="Proyectos" />
-              <StatItem end={98} suffix="%" label="Satisfaccion" />
+              <StatItem end={98} suffix="%" label="Satisfacción" />
               <StatItem end={4} suffix="+" label="Anos exp." />
             </div>
           </div>
