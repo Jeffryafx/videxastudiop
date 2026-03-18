@@ -79,7 +79,7 @@ export async function resetPasswordWithToken(token: string, newPassword: string)
 const foundUsers = await dbInstance.select().from(users).where(
     and(
       eq(users.resetToken, token),
-      gt(users.resetTokenExpires, new Date())
+      gt(users.resetTokenExpires, new Date().toISOString())
     )
   );
 

@@ -20,12 +20,7 @@ export default function AdminBlog() {
     isPublished: false,
   });
 
-  const articles = trpc.blog.getAll.useQuery(undefined, {
-    onError: (err: any) => {
-      console.error("Error fetching articles:", err);
-      toast.error(`Error al cargar artículos: ${err.message}`);
-    },
-  });
+  const articles = trpc.blog.getAll.useQuery();
   const createArticle = trpc.blog.create.useMutation({
     onSuccess: () => {
       toast.success("Artículo creado exitosamente");
@@ -234,7 +229,7 @@ export default function AdminBlog() {
             </CardContent>
           </Card>
         ) : (
-          articles.data?.map((article) => (
+          articles.data?.map((article: any) => (
             <Card key={article.id} className="border-gray-700 bg-gray-900/50">
               <CardContent className="py-4">
                 <div className="flex justify-between items-start">

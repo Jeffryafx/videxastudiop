@@ -94,7 +94,7 @@ const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.use
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {notifications.slice(0, 3).map((notif) => (
+                {notifications.slice(0, 3).map((notif: any) => (
                   <div key={notif.id} className="text-sm text-blue-800">
                     <p className="font-semibold">{notif.title}</p>
                     <p className="text-blue-700">{notif.message}</p>
@@ -114,7 +114,7 @@ const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.use
             <CardContent>
               <div className="text-2xl font-bold">{myQuotes?.length || 0}</div>
               <p className="text-xs text-gray-500 mt-1">
-                {myQuotes?.filter(q => q.status === 'pending').length || 0} pendientes
+                {myQuotes?.filter((q: any) => q.status === 'pending').length || 0} pendientes
               </p>
             </CardContent>
           </Card>
@@ -126,7 +126,7 @@ const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.use
             <CardContent>
               <div className="text-2xl font-bold">{myProjects?.length || 0}</div>
               <p className="text-xs text-gray-500 mt-1">
-                {myProjects?.filter(p => p.status === 'in-progress').length || 0} en progreso
+                {myProjects?.filter((p: any) => p.status === 'in-progress').length || 0} en progreso
               </p>
             </CardContent>
           </Card>
@@ -136,7 +136,7 @@ const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.use
               <CardTitle className="text-sm font-medium text-gray-600">Proyectos Completados</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{myProjects?.filter(p => p.status === 'completed').length || 0}</div>
+              <div className="text-2xl font-bold">{myProjects?.filter((p: any) => p.status === 'completed').length || 0}</div>
             </CardContent>
           </Card>
         </div>
@@ -162,7 +162,7 @@ const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.use
               <div className="text-center py-8">Cargando cotizaciones...</div>
             ) : myQuotes && myQuotes.length > 0 ? (
               <div className="space-y-4">
-                {myQuotes.map((quote) => (
+                {myQuotes.map((quote: any) => (
                   <Card key={quote.id}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
@@ -215,7 +215,7 @@ const { data: myQuotes, isLoading: quotesLoading } = trpc.quotes.getMyQuotes.use
               <div className="text-center py-8">Cargando proyectos...</div>
             ) : myProjects && myProjects.length > 0 ? (
               <div className="space-y-4">
-                {myProjects.map((project) => (
+                {myProjects.map((project: any) => (
                   <Card key={project.id}>
                     <CardHeader>
                       <div className="flex items-start justify-between">

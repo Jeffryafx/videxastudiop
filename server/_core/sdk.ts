@@ -262,7 +262,7 @@ if (!user) {
             name: userInfo.name || undefined,
             email: userInfo.email || undefined,
             loginMethod: userInfo.loginMethod ?? userInfo.platform ?? undefined,
-            lastSignedIn: signedInAt,
+            lastSignedIn: signedInAt instanceof Date ? signedInAt.toISOString() : String(signedInAt),
           });
           user = await db.getUserByOpenId(userInfo.openId);
         } catch (error) {
@@ -278,7 +278,7 @@ if (!user) {
       if (user.openId) {
         await db.upsertUser({
           openId: user.openId,
-          lastSignedIn: signedInAt,
+          lastSignedIn: signedInAt.toISOString(),
         });
       }
 

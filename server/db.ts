@@ -6,21 +6,18 @@ import {
   users,
   quotes,
   projects,
-  payments,
   services,
   notifications,
-  projectUpdates,
-  emailLogs,
-  portfolioItems,
-  blogArticles,
+  projectupdates,
+  emaillogs,
+  portfolioitems,
+  blogarticles,
   InsertQuote,
   InsertProject,
-  InsertPayment,
   InsertNotification,
   InsertProjectUpdate,
   InsertEmailLog,
   InsertService,
-  InsertPortfolioItem,
   InsertBlogArticle,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -74,8 +71,8 @@ export async function upsertUser(user: Partial<InsertUser> & { openId: string })
     textFields.forEach(assignNullable);
 
     if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
+      values.lastSignedIn = new Date().toISOString();
+      updateSet.lastSignedIn = new Date().toISOString();
     }
     if (user.role !== undefined) {
       values.role = user.role;
@@ -86,11 +83,11 @@ export async function upsertUser(user: Partial<InsertUser> & { openId: string })
     }
 
     if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
+      values.lastSignedIn = new Date().toISOString();
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+      updateSet.lastSignedIn = new Date().toISOString();
     }
 
 await db.insert(users).values(values as InsertUser).onDuplicateKeyUpdate({
@@ -136,7 +133,7 @@ export async function createUser(data: any) {
     name: data.name,
     role: data.role || 'user',
     loginMethod: data.loginMethod || 'email',
-    lastSignedIn: new Date(),
+    lastSignedIn: new Date().toISOString(),
   });
   return result;
 }
@@ -144,7 +141,7 @@ export async function createUser(data: any) {
 export async function updateUserLastSignedIn(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, id));
+  return await db.update(users).set({ lastSignedIn: new Date().toISOString() }).where(eq(users.id, id));
 }
 
 export async function updateUserRole(id: number, role: 'user' | 'admin') {
@@ -162,7 +159,7 @@ export async function getAdminUsers() {
 export async function getServices() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(services).where(eq(services.isActive, true));
+  return await db.select().from(services).where(eq(services.isActive, 1));
 }
 
 export async function getServiceById(id: number) {
@@ -268,42 +265,13 @@ export async function updateProjectProgress(id: number, data: Partial<typeof pro
 export async function addProjectUpdate(data: InsertProjectUpdate) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.insert(projectUpdates).values(data);
+  return await db.insert(projectupdates).values(data);
 }
 
 export async function getProjectUpdates(projectId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(projectUpdates).where(eq(projectUpdates.projectId, projectId)).orderBy(desc(projectUpdates.createdAt));
-}
-
-export async function createPayment(data: InsertPayment) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return await db.insert(payments).values(data);
-}
-
-export async function getPaymentById(id: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(payments).where(eq(payments.id, id)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function getProjectPayments(projectId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(payments).where(eq(payments.projectId, projectId));
-}
-
-export async function updatePaymentStatus(id: number, status: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return await db.update(payments).set({
-    paymentStatus: status as any,
-    paidAt: status === 'completed' ? new Date() : undefined,
-    updatedAt: new Date()
-  }).where(eq(payments.id, id));
+  return await db.select().from(projectupdates).where(eq(projectupdates.projectId, projectId)).orderBy(desc(projectupdates.createdAt));
 }
 
 export async function createNotification(data: InsertNotification) {
@@ -327,52 +295,31 @@ export async function markNotificationAsRead(id: number) {
 export async function logEmail(data: InsertEmailLog) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.insert(emailLogs).values(data);
+  return await db.insert(emaillogs).values(data);
 }
 
 export async function getEmailLogs(limit: number = 100) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(emailLogs).orderBy(desc(emailLogs.createdAt)).limit(limit);
-}
-
-export async function createPortfolioItem(data: InsertPortfolioItem) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const result = await db.insert(portfolioItems).values(data);
-  const insertedId = result[0].insertId;
-  const item = await db.select().from(portfolioItems).where(eq(portfolioItems.id, insertedId as any)).limit(1);
-  return item[0];
+  return await db.select().from(emaillogs).orderBy(desc(emaillogs.createdAt)).limit(limit);
 }
 
 export async function getPublicPortfolioItems() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(portfolioItems).where(eq(portfolioItems.isPublic, true)).orderBy(desc(portfolioItems.createdAt));
+  return await db.select().from(portfolioitems).where(eq(portfolioitems.isPublic, 1)).orderBy(desc(portfolioitems.createdAt));
 }
 
 export async function getProjectPortfolioItems(projectId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(portfolioItems).where(eq(portfolioItems.projectId, projectId));
-}
-
-export async function updatePortfolioItem(id: number, data: Partial<InsertPortfolioItem>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return await db.update(portfolioItems).set(data).where(eq(portfolioItems.id, id));
-}
-
-export async function deletePortfolioItem(id: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return await db.delete(portfolioItems).where(eq(portfolioItems.id, id));
+  return await db.select().from(portfolioitems).where(eq(portfolioitems.projectId, projectId));
 }
 
 export async function createBlogArticle(data: InsertBlogArticle) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const result = await db.insert(blogArticles).values(data);
+  const result = await db.insert(blogarticles).values(data);
   // Retrieve the created article
   const insertedId = result[0].insertId;
   const article = await getBlogArticleById(insertedId as any);
@@ -382,7 +329,7 @@ export async function createBlogArticle(data: InsertBlogArticle) {
 export async function getBlogArticles(limit?: number) {
   const db = await getDb();
   if (!db) return [];
-  let query = db.select().from(blogArticles).where(eq(blogArticles.isPublished, true)).orderBy(desc(blogArticles.publishedAt));
+  let query = db.select().from(blogarticles).where(eq(blogarticles.isPublished, 1)).orderBy(desc(blogarticles.publishedAt));
   if (limit) {
     query = query.limit(limit) as any;
   }
@@ -392,31 +339,31 @@ export async function getBlogArticles(limit?: number) {
 export async function getAllBlogArticles() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(blogArticles).orderBy(desc(blogArticles.publishedAt));
+  return await db.select().from(blogarticles).orderBy(desc(blogarticles.publishedAt));
 }
 
 export async function getBlogArticleBySlug(slug: string) {
   const db = await getDb();
   if (!db) return null;
-  const result = await db.select().from(blogArticles).where(eq(blogArticles.slug, slug)).limit(1);
+  const result = await db.select().from(blogarticles).where(eq(blogarticles.slug, slug)).limit(1);
   return result.length > 0 ? result[0] : null;
 }
 
 export async function getBlogArticleById(id: number) {
   const db = await getDb();
   if (!db) return null;
-  const result = await db.select().from(blogArticles).where(eq(blogArticles.id, id)).limit(1);
+  const result = await db.select().from(blogarticles).where(eq(blogarticles.id, id)).limit(1);
   return result.length > 0 ? result[0] : null;
 }
 
 export async function updateBlogArticle(id: number, data: Partial<InsertBlogArticle>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.update(blogArticles).set(data).where(eq(blogArticles.id, id));
+  return await db.update(blogarticles).set(data).where(eq(blogarticles.id, id));
 }
 
 export async function deleteBlogArticle(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.delete(blogArticles).where(eq(blogArticles.id, id));
+  return await db.delete(blogarticles).where(eq(blogarticles.id, id));
 }

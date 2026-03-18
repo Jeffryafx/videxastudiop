@@ -112,12 +112,12 @@ services: router({
         return await db.createService({
           name: input.name,
           slug: input.slug,
-          description: input.description,
-          basePrice: input.basePrice as any,
-          icon: input.icon,
+          description: input.description || null,
+          basePrice: parseFloat(input.basePrice) as any,
+          icon: input.icon && input.icon.trim() ? input.icon.trim() : null,
           category: input.category,
-          features: input.features,
-          isActive: true,
+          features: input.features || null,
+          isActive: 1,
         });
       }),
 
@@ -133,7 +133,14 @@ services: router({
       }))
       .mutation(async ({ input }) => {
         const { id, ...updateData } = input;
-        return await db.updateService(id, updateData as any);
+        const cleanedData = {
+          ...updateData,
+          basePrice: updateData.basePrice ? parseFloat(updateData.basePrice) : undefined,
+          icon: updateData.icon && updateData.icon.trim() ? updateData.icon.trim() : null,
+          description: updateData.description || undefined,
+          features: updateData.features || undefined,
+        };
+        return await db.updateService(id, cleanedData as any);
       }),
 
     delete: adminProcedure
@@ -233,7 +240,7 @@ projects: router({
           description: input.description,
           status: 'pending',
           priority: 'medium',
-          dueDate: input.dueDate,
+          dueDate: input.dueDate ? input.dueDate.toISOString() : null,
         });
 
 const projectId = (project as any).insertId || (project as any)[0]?.id || 0;
@@ -336,55 +343,6 @@ await db.createNotification({
     }),
   }),
 
-payments: router({
-    create: protectedProcedure
-      .input(z.object({
-        projectId: z.number(),
-        quoteId: z.number(),
-        amount: z.string(),
-        paymentMethod: z.enum(['paypal', 'stripe', 'bank-transfer', 'cash']),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
-
-        const payment = await db.createPayment({
-          projectId: input.projectId,
-          quoteId: input.quoteId,
-          clientId: ctx.user.id,
-          amount: input.amount as any,
-          paymentMethod: input.paymentMethod,
-          paymentStatus: 'pending',
-        });
-
-        return payment;
-      }),
-
-    getProjectPayments: publicProcedure.input(z.object({ projectId: z.number() })).query(async ({ input }) => {
-      return await db.getProjectPayments(input.projectId);
-    }),
-
-    updateStatus: adminProcedure
-      .input(z.object({ id: z.number(), status: z.enum(['pending', 'processing', 'completed', 'failed', 'refunded']) }))
-      .mutation(async ({ input }) => {
-        const payment = await db.getPaymentById(input.id);
-        if (!payment) throw new TRPCError({ code: 'NOT_FOUND' });
-
-        await db.updatePaymentStatus(input.id, input.status);
-
-if (input.status === 'completed') {
-          await db.createNotification({
-            userId: payment.clientId,
-            type: 'payment-received',
-            title: 'Pago recibido',
-            message: `Tu pago de $${payment.amount} ha sido procesado`,
-            relatedProjectId: payment.projectId,
-          });
-        }
-
-        return { success: true };
-      }),
-  }),
-
 notifications: router({
     getMyNotifications: protectedProcedure.query(async ({ ctx }) => {
       return await db.getUserNotifications(ctx.user!.id);
@@ -436,8 +394,8 @@ blog: router({
           thumbnailUrl: input.thumbnailUrl,
           readingTime: input.readingTime,
           authorId: ctx.user!.id,
-          isPublished: input.isPublished,
-          publishedAt: input.isPublished ? new Date() : null,
+          isPublished: input.isPublished ? 1 : 0,
+          publishedAt: input.isPublished ? new Date().toISOString() : undefined,
         });
       }),
 
@@ -495,66 +453,6 @@ portfolio: router({
     getProjectItems: publicProcedure.input(z.object({ projectId: z.number() })).query(async ({ input }) => {
       return await db.getProjectPortfolioItems(input.projectId);
     }),
-
-    create: adminProcedure
-      .input(z.object({
-        projectId: z.number().optional(),
-        title: z.string(),
-        description: z.string().optional(),
-        category: z.string(),
-        duration: z.string().optional(),
-        thumbnailUrl: z.string(),
-        videoUrl: z.string(),
-        clientName: z.string().optional(),
-        isPublic: z.boolean().default(false),
-      }))
-      .mutation(async ({ input }) => {
-        return await db.createPortfolioItem({
-          projectId: input.projectId,
-          title: input.title,
-          description: input.description,
-          category: input.category,
-          duration: input.duration,
-          thumbnailUrl: input.thumbnailUrl,
-          videoUrl: input.videoUrl,
-          clientName: input.clientName,
-          isPublic: input.isPublic,
-        });
-      }),
-
-    update: adminProcedure
-      .input(z.object({
-        id: z.number(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        category: z.string().optional(),
-        duration: z.string().optional(),
-        thumbnailUrl: z.string().optional(),
-        videoUrl: z.string().optional(),
-        clientName: z.string().optional(),
-        isPublic: z.boolean().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        const updateData: any = {};
-        if (input.title) updateData.title = input.title;
-        if (input.description) updateData.description = input.description;
-        if (input.category) updateData.category = input.category;
-        if (input.duration) updateData.duration = input.duration;
-        if (input.thumbnailUrl) updateData.thumbnailUrl = input.thumbnailUrl;
-        if (input.videoUrl) updateData.videoUrl = input.videoUrl;
-        if (input.clientName) updateData.clientName = input.clientName;
-        if (input.isPublic !== undefined) updateData.isPublic = input.isPublic;
-
-        await db.updatePortfolioItem(input.id, updateData);
-        return { success: true };
-      }),
-
-    delete: adminProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.deletePortfolioItem(input.id);
-        return { success: true };
-      }),
   }),
 });
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
 import ServicesSection from "../components/ServicesSection";
@@ -11,8 +11,10 @@ import Footer from "../components/Footer";
 import ScrollToTop from "../components/ScrollToTop";
 
 export default function Home() {
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -23,10 +25,23 @@ export default function Home() {
       { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
     );
 
-    const elements = document.querySelectorAll(".reveal, .reveal-left, .reveal-right");
-    elements.forEach((el) => observer.observe(el));
+    const observeElements = () => {
+      const elements = document.querySelectorAll(".reveal, .reveal-left, .reveal-right");
+      elements.forEach((el) => {
+        if (observerRef.current) {
+          observerRef.current.observe(el);
+        }
+      });
+    };
 
-    return () => observer.disconnect();
+    observeElements();
+    
+    const timer = setInterval(observeElements, 500);
+
+    return () => {
+      clearInterval(timer);
+      observerRef.current?.disconnect();
+    };
   }, []);
 
   return (

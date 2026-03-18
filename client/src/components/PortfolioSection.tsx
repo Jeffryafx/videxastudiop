@@ -1,7 +1,6 @@
 
 import { useState } from "react";
-import { Play, ExternalLink, Loader2, X } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { Play, ExternalLink, X } from "lucide-react";
 
 const categories = ["Todos", "reel", "motion-graphics", "brand-pack", "captions"];
 
@@ -21,11 +20,46 @@ const categoryColors: Record<string, { color: string; accent: string }> = {
   promo: { color: "#22D3EE", accent: "rgba(34,211,238,0.15)" },
 };
 
+const portfolioVideos = [
+  {
+    id: 1,
+    title: "Estáticos Marzo",
+    description: "Proyecto de diseño estático con movimiento",
+    category: "reel",
+    duration: "60s",
+    videoUrl: "/portfolio-videos/Estaticos%20Marzo.mp4",
+    thumbnailUrl: "https://via.placeholder.com/400x300/7C5CFC/FFFFFF?text=Estaticos",
+    clientName: "Mi Studio",
+    isPublic: true,
+  },  
+  {
+    id: 2,
+    title: "Grasa Ombligo",
+    description: "Pieza de movimiento y animación",
+    category: "reel",
+    duration: "45s",
+    videoUrl: "/portfolio-videos/GRASA%20OMBLIGO-1.mp4",
+    thumbnailUrl: "https://via.placeholder.com/400x300/00E5A0/FFFFFF?text=Grasa",
+    clientName: "Mi Studio",
+    isPublic: true,
+  },
+  {
+    id: 3,
+    title: "Hero Web",
+    description: "Animación para sitio web profesional",
+    category: "reel",
+    duration: "30s",
+    videoUrl: "/portfolio-videos/Hero%20Web.mp4",
+    thumbnailUrl: "https://via.placeholder.com/400x300/22D3EE/FFFFFF?text=Hero+Web",
+    clientName: "Mi Studio",
+    isPublic: true,
+  },
+];
+
 export default function PortfolioSection() {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
-  const portfolioQuery = trpc.portfolio.getPublic.useQuery();
-  const items = portfolioQuery.data || [];
+  const items = portfolioVideos;
 
   const getColorForCategory = (category: string) => {
     return categoryColors[category] || categoryColors.reel;
@@ -98,11 +132,7 @@ export default function PortfolioSection() {
 
         {}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4" style={{ gridAutoRows: '200px' }}>
-          {portfolioQuery.isLoading ? (
-            <div className="col-span-3 flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-[#00E5A0]" />
-            </div>
-          ) : filtered.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="col-span-3 text-center py-12 text-[#6B7494]">
               No hay proyectos disponibles en esta categoría
             </div>

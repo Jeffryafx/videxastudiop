@@ -774,13 +774,13 @@ export default function ComponentsShowcase() {
                       <TableRow>
                         <TableCell className="font-medium">INV002</TableCell>
                         <TableCell>Pending</TableCell>
-                        <TableCell>PayPal</TableCell>
+                        <TableCell>Bank Transfer</TableCell>
                         <TableCell className="text-right">$150.00</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell className="font-medium">INV003</TableCell>
                         <TableCell>Unpaid</TableCell>
-                        <TableCell>Bank Transfer</TableCell>
+                        <TableCell>Wire Transfer</TableCell>
                         <TableCell className="text-right">$350.00</TableCell>
                       </TableRow>
                     </TableBody>

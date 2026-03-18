@@ -1,263 +1,200 @@
-import {
-  int,
-  mysqlEnum,
-  mysqlTable,
-  text,
-  timestamp,
-  varchar,
-  decimal,
-  boolean,
-  datetime
-} from "drizzle-orm/mysql-core";
-import { relations, sql } from "drizzle-orm";
+import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, foreignKey, unique, int, varchar, text, timestamp, mysqlEnum, datetime, decimal, tinyint } from "drizzle-orm/mysql-core"
+import { sql } from "drizzle-orm"
 
-export const users = mysqlTable("users", {
-  id: int("id").autoincrement().primaryKey(),
-  openId: varchar("openId", { length: 64 }).unique(),
-  name: text("name"),
-  email: varchar("email", { length: 320 }).notNull().unique(),
-  phone: varchar("phone", { length: 20 }),
-  password: text("password"),
-  loginMethod: varchar("loginMethod", { length: 64 }).default("email"),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
-  company: text("company"),
-  resetToken: text("resetToken"),
-  resetTokenExpires: timestamp('resetTokenExpires'),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-});
+export const blogarticles = mysqlTable("blogarticles", {
+	id: int().autoincrement().primaryKey().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	slug: varchar({ length: 255 }).notNull(),
+	category: varchar({ length: 50 }).notNull(),
+	excerpt: text(),
+	content: text().notNull(),
+	thumbnailUrl: text(),
+	readingTime: int(),
+	authorId: int().notNull().references(() => users.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	isPublished: tinyint().default(0).notNull(),
+	publishedAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+},
+(table) => [
+	index("authorId").on(table.authorId),
+	index("idx_blogarticles_slug").on(table.slug),
+	unique("slug").on(table.slug),
+]);
 
-export type User = typeof users.$inferSelect;
-export type InsertUser = typeof users.$inferInsert;
-
-export const services = mysqlTable("services", {
-  id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  slug: varchar("slug", { length: 100 }).notNull().unique(),
-  description: text("description"),
-  basePrice: decimal("basePrice", { precision: 10, scale: 2 }).notNull(),
-  icon: varchar("icon", { length: 50 }),
-  category: varchar("category", { length: 50 }).notNull(),
-  features: text("features"),
-  isActive: boolean("isActive").default(true).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Service = typeof services.$inferSelect;
-export type InsertService = typeof services.$inferInsert;
-
-export const quotes = mysqlTable("quotes", {
-  id: int("id").autoincrement().primaryKey(),
-  clientId: int("clientId").notNull(),
-  serviceId: int("serviceId").notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description"),
-  estimatedPrice: decimal("estimatedPrice", { precision: 10, scale: 2 }),
-  finalPrice: decimal("finalPrice", { precision: 10, scale: 2 }),
-  status: mysqlEnum("status", ["pending", "approved", "rejected", "completed"]).default("pending").notNull(),
-  notes: text("notes"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  expiresAt: datetime("expiresAt"),
-});
-
-export type Quote = typeof quotes.$inferSelect;
-export type InsertQuote = typeof quotes.$inferInsert;
-
-export const projects = mysqlTable("projects", {
-  id: int("id").autoincrement().primaryKey(),
-  quoteId: int("quoteId").notNull(),
-  clientId: int("clientId").notNull(),
-  serviceId: int("serviceId").notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description"),
-  status: mysqlEnum("status", ["pending", "in-progress", "completed", "on-hold", "cancelled"]).default("pending").notNull(),
-  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).default("medium").notNull(),
-
-deliverables: text("deliverables"),
-  timeline: varchar("timeline", { length: 100 }),
-
-clientFilesUrl: text("clientFilesUrl"),
-  deliveryFilesUrl: text("deliveryFilesUrl"),
-
-startDate: datetime("startDate"),
-  dueDate: datetime("dueDate"),
-  completedDate: datetime("completedDate"),
-
-assignedTo: int("assignedTo"),
-
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Project = typeof projects.$inferSelect;
-export type InsertProject = typeof projects.$inferInsert;
-
-export const projectUpdates = mysqlTable("projectUpdates", {
-  id: int("id").autoincrement().primaryKey(),
-  projectId: int("projectId").notNull(),
-  updateType: mysqlEnum("updateType", ["revision-request", "status-change", "file-upload", "comment", "approval"]).notNull(),
-  message: text("message"),
-  fileUrl: text("fileUrl"),
-  createdBy: int("createdBy").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type ProjectUpdate = typeof projectUpdates.$inferSelect;
-export type InsertProjectUpdate = typeof projectUpdates.$inferInsert;
-
-export const payments = mysqlTable("payments", {
-  id: int("id").autoincrement().primaryKey(),
-  projectId: int("projectId").notNull(),
-  quoteId: int("quoteId").notNull(),
-  clientId: int("clientId").notNull(),
-
-  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
-
-  paymentMethod: mysqlEnum("paymentMethod", ["paypal", "stripe", "bank-transfer", "cash"]).notNull(),
-  paymentStatus: mysqlEnum("paymentStatus", ["pending", "processing", "completed", "failed", "refunded"]).default("pending").notNull(),
-
-transactionId: varchar("transactionId", { length: 255 }),
-  paypalOrderId: varchar("paypalOrderId", { length: 255 }),
-
-invoiceNumber: varchar("invoiceNumber", { length: 50 }).unique(),
-  invoiceUrl: text("invoiceUrl"),
-
-  notes: text("notes"),
-
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  paidAt: datetime("paidAt"),
-});
-
-export type Payment = typeof payments.$inferSelect;
-export type InsertPayment = typeof payments.$inferInsert;
+export const emaillogs = mysqlTable("emaillogs", {
+	id: int().autoincrement().primaryKey().notNull(),
+	recipientEmail: varchar({ length: 320 }).notNull(),
+	subject: varchar({ length: 255 }).notNull(),
+	emailType: varchar({ length: 50 }).notNull(),
+	status: mysqlEnum(['sent','failed','bounced']).default('sent').notNull(),
+	relatedProjectId: int().references(() => projects.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	relatedQuoteId: int().references(() => quotes.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	errorMessage: text(),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+},
+(table) => [
+	index("relatedProjectId").on(table.relatedProjectId),
+	index("relatedQuoteId").on(table.relatedQuoteId),
+]);
 
 export const notifications = mysqlTable("notifications", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  type: mysqlEnum("type", [
-    "quote-created",
-    "quote-approved",
-    "quote-rejected",
-    "project-started",
-    "project-update",
-    "revision-requested",
-    "payment-received",
-    "project-completed",
-    "message"
-  ]).notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  message: text("message"),
-  relatedProjectId: int("relatedProjectId"),
-  relatedQuoteId: int("relatedQuoteId"),
-  isRead: boolean("isRead").default(false).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
+	id: int().autoincrement().primaryKey().notNull(),
+	userId: int().notNull().references(() => users.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	type: mysqlEnum(['quote-created','quote-approved','quote-rejected','project-started','project-update','revision-requested','project-completed','message']).notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	message: text(),
+	relatedProjectId: int().references(() => projects.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	relatedQuoteId: int().references(() => quotes.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	isRead: tinyint().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+},
+(table) => [
+	index("relatedProjectId").on(table.relatedProjectId),
+	index("relatedQuoteId").on(table.relatedQuoteId),
+	index("idx_notifications_userId").on(table.userId),
+	index("idx_notifications_type").on(table.type),
+]);
+
+export const portfolioitems = mysqlTable("portfolioitems", {
+	id: int().autoincrement().primaryKey().notNull(),
+	projectId: int().references(() => projects.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	title: varchar({ length: 255 }).notNull(),
+	description: text(),
+	category: varchar({ length: 50 }).notNull(),
+	duration: varchar({ length: 50 }),
+	thumbnailUrl: text(),
+	videoUrl: text(),
+	clientName: varchar({ length: 255 }),
+	isPublic: tinyint().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+},
+(table) => [
+	index("idx_portfolioitems_projectId").on(table.projectId),
+]);
+
+export const projects = mysqlTable("projects", {
+	id: int().autoincrement().primaryKey().notNull(),
+	quoteId: int().notNull().references(() => quotes.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	clientId: int().notNull().references(() => users.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	serviceId: int().notNull().references(() => services.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	title: varchar({ length: 255 }).notNull(),
+	description: text(),
+	status: mysqlEnum(['pending','in-progress','completed','on-hold','cancelled']).default('pending').notNull(),
+	priority: mysqlEnum(['low','medium','high','urgent']).default('medium').notNull(),
+	deliverables: text(),
+	timeline: varchar({ length: 100 }),
+	clientFilesUrl: text(),
+	deliveryFilesUrl: text(),
+	startDate: datetime({ mode: 'string'}),
+	dueDate: datetime({ mode: 'string'}),
+	completedDate: datetime({ mode: 'string'}),
+	assignedTo: int().references(() => users.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+},
+(table) => [
+	index("serviceId").on(table.serviceId),
+	index("assignedTo").on(table.assignedTo),
+	index("idx_projects_clientId").on(table.clientId),
+	index("idx_projects_quoteId").on(table.quoteId),
+]);
+
+export const projectupdates = mysqlTable("projectupdates", {
+	id: int().autoincrement().primaryKey().notNull(),
+	projectId: int().notNull().references(() => projects.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	updateType: mysqlEnum(['revision-request','status-change','file-upload','comment','approval']).notNull(),
+	message: text(),
+	fileUrl: text(),
+	createdBy: int().notNull().references(() => users.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+},
+(table) => [
+	index("createdBy").on(table.createdBy),
+	index("idx_projectupdates_projectId").on(table.projectId),
+]);
+
+export const quotes = mysqlTable("quotes", {
+	id: int().autoincrement().primaryKey().notNull(),
+	clientId: int().notNull().references(() => users.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	serviceId: int().notNull().references(() => services.id, { onDelete: "restrict", onUpdate: "restrict" } ),
+	title: varchar({ length: 255 }).notNull(),
+	description: text(),
+	estimatedPrice: decimal({ precision: 10, scale: 2 }),
+	finalPrice: decimal({ precision: 10, scale: 2 }),
+	status: mysqlEnum(['pending','approved','rejected','completed']).default('pending').notNull(),
+	notes: text(),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	expiresAt: datetime({ mode: 'string'}),
+},
+(table) => [
+	index("idx_quotes_clientId").on(table.clientId),
+	index("idx_quotes_serviceId").on(table.serviceId),
+]);
+
+export const services = mysqlTable("services", {
+	id: int().autoincrement().primaryKey().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	slug: varchar({ length: 100 }).notNull(),
+	description: text(),
+	basePrice: decimal({ precision: 10, scale: 2 }).notNull(),
+	icon: varchar({ length: 50 }),
+	category: varchar({ length: 50 }).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	features: text(),
+},
+(table) => [
+	unique("slug").on(table.slug),
+]);
+
+export const users = mysqlTable("users", {
+	id: int().autoincrement().primaryKey().notNull(),
+	openId: varchar({ length: 64 }),
+	name: text(),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 20 }),
+	password: text(),
+	loginMethod: varchar({ length: 64 }).default('email'),
+	role: mysqlEnum(['user','admin']).default('user').notNull(),
+	company: text(),
+	resetToken: text(),
+	resetTokenExpires: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().notNull(),
+	lastSignedIn: timestamp({ mode: 'string' }).defaultNow().notNull(),
+},
+(table) => [
+	unique("email").on(table.email),
+	unique("users_openId_unique").on(table.openId),
+]);
+
+// Export types
+export type BlogArticle = typeof blogarticles.$inferSelect;
+export type InsertBlogArticle = typeof blogarticles.$inferInsert;
+
+export type EmailLog = typeof emaillogs.$inferSelect;
+export type InsertEmailLog = typeof emaillogs.$inferInsert;
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
 
-export const emailLogs = mysqlTable("emailLogs", {
-  id: int("id").autoincrement().primaryKey(),
-  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
-  subject: varchar("subject", { length: 255 }).notNull(),
-  emailType: varchar("emailType", { length: 50 }).notNull(),
-  status: mysqlEnum("status", ["sent", "failed", "bounced"]).default("sent").notNull(),
-  relatedProjectId: int("relatedProjectId"),
-  relatedQuoteId: int("relatedQuoteId"),
-  errorMessage: text("errorMessage"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
+export type PortfolioItem = typeof portfolioitems.$inferSelect;
+export type InsertPortfolioItem = typeof portfolioitems.$inferInsert;
 
-export type EmailLog = typeof emailLogs.$inferSelect;
-export type InsertEmailLog = typeof emailLogs.$inferInsert;
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = typeof projects.$inferInsert;
 
-export const blogArticles = mysqlTable("blogArticles", {
-  id: int("id").autoincrement().primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
-  slug: varchar("slug", { length: 255 }).notNull().unique(),
-  category: varchar("category", { length: 50 }).notNull(),
-  excerpt: text("excerpt"),
-  content: text("content").notNull(),
-  thumbnailUrl: text("thumbnailUrl"),
-  readingTime: int("readingTime"),
-  authorId: int("authorId").notNull(),
-  isPublished: boolean("isPublished").default(false).notNull(),
-  publishedAt: timestamp("publishedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+export type ProjectUpdate = typeof projectupdates.$inferSelect;
+export type InsertProjectUpdate = typeof projectupdates.$inferInsert;
 
-export type BlogArticle = typeof blogArticles.$inferSelect;
-export type InsertBlogArticle = typeof blogArticles.$inferInsert;
+export type Quote = typeof quotes.$inferSelect;
+export type InsertQuote = typeof quotes.$inferInsert;
 
-export const portfolioItems = mysqlTable("portfolioItems", {
-  id: int("id").autoincrement().primaryKey(),
-  projectId: int("projectId"),
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description"),
-  category: varchar("category", { length: 50 }).notNull(),
-  duration: varchar("duration", { length: 50 }),
-  thumbnailUrl: text("thumbnailUrl"),
-  videoUrl: text("videoUrl"),
-  clientName: varchar("clientName", { length: 255 }),
-  isPublic: boolean("isPublic").default(false).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
+export type Service = typeof services.$inferSelect;
+export type InsertService = typeof services.$inferInsert;
 
-export type PortfolioItem = typeof portfolioItems.$inferSelect;
-export type InsertPortfolioItem = typeof portfolioItems.$inferInsert;
-
-export const usersRelations = relations(users, ({ many }) => ({
-  quotes: many(quotes),
-  projects: many(projects),
-  notifications: many(notifications),
-  payments: many(payments),
-}));
-
-export const servicesRelations = relations(services, ({ many }) => ({
-  quotes: many(quotes),
-  projects: many(projects),
-}));
-
-export const quotesRelations = relations(quotes, ({ one, many }) => ({
-  client: one(users, { fields: [quotes.clientId], references: [users.id] }),
-  service: one(services, { fields: [quotes.serviceId], references: [services.id] }),
-  projects: many(projects),
-  payments: many(payments),
-}));
-
-export const projectsRelations = relations(projects, ({ one, many }) => ({
-  client: one(users, { fields: [projects.clientId], references: [users.id] }),
-  quote: one(quotes, { fields: [projects.quoteId], references: [quotes.id] }),
-  service: one(services, { fields: [projects.serviceId], references: [services.id] }),
-  assignee: one(users, { fields: [projects.assignedTo], references: [users.id] }),
-  updates: many(projectUpdates),
-  payments: many(payments),
-  portfolioItems: many(portfolioItems),
-}));
-
-export const projectUpdatesRelations = relations(projectUpdates, ({ one }) => ({
-  project: one(projects, { fields: [projectUpdates.projectId], references: [projects.id] }),
-  creator: one(users, { fields: [projectUpdates.createdBy], references: [users.id] }),
-}));
-
-export const paymentsRelations = relations(payments, ({ one }) => ({
-  project: one(projects, { fields: [payments.projectId], references: [projects.id] }),
-  quote: one(quotes, { fields: [payments.quoteId], references: [quotes.id] }),
-  client: one(users, { fields: [payments.clientId], references: [users.id] }),
-}));
-
-export const notificationsRelations = relations(notifications, ({ one }) => ({
-  user: one(users, { fields: [notifications.userId], references: [users.id] }),
-  project: one(projects, { fields: [notifications.relatedProjectId], references: [projects.id] }),
-  quote: one(quotes, { fields: [notifications.relatedQuoteId], references: [quotes.id] }),
-}));
-
-export const portfolioItemsRelations = relations(portfolioItems, ({ one }) => ({
-  project: one(projects, { fields: [portfolioItems.projectId], references: [projects.id] }),
-}));
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;

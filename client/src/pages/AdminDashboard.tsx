@@ -15,9 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle, Clock, AlertCircle, DollarSign, Loader2, LogOut, BookOpen, Film, Package } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle, DollarSign, Loader2, LogOut, BookOpen, Package } from "lucide-react";
 import AdminBlog from "./AdminBlog";
-import AdminPortfolio from "./AdminPortfolio";
 import AdminServices from "./AdminServices";
 import { toast } from "sonner";
 
@@ -138,9 +137,9 @@ console.log('[AdminDashboard] Validando acceso:', { role: user?.role, isAdmin: u
     return labels[status] || status;
   };
 
-  const pendingQuotes = quotes?.filter((q) => q.status === "pending").length || 0;
-  const approvedQuotes = quotes?.filter((q) => q.status === "approved").length || 0;
-  const completedQuotes = quotes?.filter((q) => q.status === "completed").length || 0;
+  const pendingQuotes = quotes?.filter((q: any) => q.status === "pending").length || 0;
+  const approvedQuotes = quotes?.filter((q: any) => q.status === "approved").length || 0;
+  const completedQuotes = quotes?.filter((q: any) => q.status === "completed").length || 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -216,10 +215,6 @@ console.log('[AdminDashboard] Validando acceso:', { role: user?.role, isAdmin: u
               <BookOpen className="w-4 h-4" />
               Blog
             </TabsTrigger>
-            <TabsTrigger value="portfolio" className="flex items-center gap-2">
-              <Film className="w-4 h-4" />
-              Portafolio
-            </TabsTrigger>
           </TabsList>
 
           {}
@@ -247,7 +242,7 @@ console.log('[AdminDashboard] Validando acceso:', { role: user?.role, isAdmin: u
                         </tr>
                       </thead>
                       <tbody>
-                        {quotes.map((quote) => (
+                        {quotes.map((quote: any) => (
                           <tr key={quote.id} className="border-b border-gray-100 hover:bg-gray-50">
                             <td className="py-3 px-4">
                               <div>
@@ -329,7 +324,7 @@ console.log('[AdminDashboard] Validando acceso:', { role: user?.role, isAdmin: u
                         </tr>
                       </thead>
                       <tbody>
-                        {projects.map((project) => (
+                        {projects.map((project: any) => (
                           <tr key={project.id} className="border-b border-gray-100 hover:bg-gray-50">
                             <td className="py-3 px-4">
                               <div>
@@ -396,11 +391,6 @@ console.log('[AdminDashboard] Validando acceso:', { role: user?.role, isAdmin: u
 
           <TabsContent value="blog" className="space-y-4">
             <AdminBlog />
-          </TabsContent>
-
-          {}
-          <TabsContent value="portfolio" className="space-y-4">
-            <AdminPortfolio />
           </TabsContent>
         </Tabs>
       </div>

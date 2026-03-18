@@ -1,6 +1,6 @@
 
 
-import { Scissors, Sparkles, Package, CheckCircle, Loader2 } from "lucide-react";
+import { Scissors, Sparkles, Package, CheckCircle, Loader2, Film, Zap } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 const serviceMetadata = {
@@ -28,7 +28,30 @@ const serviceMetadata = {
     popular: false,
     delay: "0.2s",
   },
+  'video-corporativo': {
+    icon: Film,
+    iconColor: "#FF6B6B",
+    iconBg: "rgba(255,107,107,0.1)",
+    features: ["Producción profesional", "Edición avanzada", "Efectos visuales", "Audio profesional"],
+    popular: false,
+    delay: "0.3s",
+  },
+  'social-media-content': {
+    icon: Zap,
+    iconColor: "#FFD93D",
+    iconBg: "rgba(255,217,61,0.1)",
+    features: ["Contenido viral", "Optimización plataforma", "Captions atractivos", "Alta calidad"],
+    popular: false,
+    delay: "0.4s",
+  },
 } as const;
+
+const defaultMetadata = {
+  icon: Sparkles,
+  iconColor: "#00E5A0",
+  iconBg: "rgba(0,229,160,0.1)",
+  popular: false,
+};
 
 export default function ServicesSection() {
   const servicesQuery = trpc.services.list.useQuery();
@@ -92,23 +115,26 @@ export default function ServicesSection() {
             </div>
           ) : (
             services.map((service: any, index: number) => {
-              const metadata = serviceMetadata[service.category as keyof typeof serviceMetadata];
-              if (!metadata) return null;
-
-              const Icon = metadata.icon;
+              const metadata = serviceMetadata[service.slug as keyof typeof serviceMetadata] || serviceMetadata[service.category as keyof typeof serviceMetadata] || { ...defaultMetadata, delay: `${index * 0.1}s` };
+              
+              const Icon = metadata.icon || defaultMetadata.icon;
+              const iconColor = metadata.iconColor || defaultMetadata.iconColor;
+              const iconBg = metadata.iconBg || defaultMetadata.iconBg;
+              const popular = metadata.popular || defaultMetadata.popular;
+              const delay = metadata.delay || `${index * 0.1}s`;
               return (
                 <div
                   key={service.id}
-                  className={`service-card reveal flex flex-col ${metadata.popular ? "ring-1 ring-[#7C5CFC]/40" : ""}`}
+                  className={`service-card reveal flex flex-col ${popular ? "ring-1 ring-[#7C5CFC]/40" : ""}`}
                   style={{
-                    animationDelay: metadata.delay,
+                    animationDelay: delay,
                     transitionDelay: `${index * 0.1}s`,
-                    ...(metadata.popular
+                    ...(popular
                       ? { boxShadow: "0 0 40px rgba(124,92,252,0.15), 0 0 0 1px rgba(124,92,252,0.2)" }
                       : {}),
                   }}
                 >
-                  {metadata.popular && (
+                  {popular && (
                     <div className="flex justify-end mb-3">
                       <span className="badge-popular">mas popular</span>
                     </div>
@@ -116,9 +142,9 @@ export default function ServicesSection() {
 
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                    style={{ background: metadata.iconBg }}
+                    style={{ background: iconBg }}
                   >
-                    <Icon size={22} style={{ color: metadata.iconColor }} />
+                    <Icon size={22} style={{ color: iconColor }} />
                   </div>
 
                   <h3
@@ -142,7 +168,7 @@ export default function ServicesSection() {
                   <ul className="flex flex-col gap-2.5 mb-6 flex-1">
                     {(service.features ? service.features.split(',').map((f: string) => f.trim()) : []).map((feature: string) => (
                       <li key={feature} className="flex items-center gap-2.5">
-                        <CheckCircle size={14} className="flex-shrink-0" style={{ color: metadata.iconColor }} />
+                        <CheckCircle size={14} className="flex-shrink-0" style={{ color: iconColor }} />
                         <span
                           className="text-[#6B7494] text-sm"
                           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}

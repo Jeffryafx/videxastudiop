@@ -55,7 +55,7 @@ export default function BlogSection() {
 
         {}
         <div className="grid md:grid-cols-3 gap-6">
-          {displayArticles.map((article, index) => {
+          {displayArticles.map((article: any, index: number) => {
             const categoryColors: Record<string, string> = {
               Tutorial: "#7C5CFC",
               Tendencias: "#00E5A0",

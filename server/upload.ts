@@ -4,7 +4,7 @@ import { join } from "path";
 
 const UPLOAD_DIR = join(process.cwd(), "client", "public", "uploads");
 
-export async function handleVideoUpload(req: Request, res: Response) {
+export async function handleVideoUpload(req: Request & { file?: any }, res: Response) {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file provided" });

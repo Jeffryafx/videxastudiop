@@ -33,7 +33,7 @@ export function registerOAuthRoutes(app: Express) {
         name: userInfo.name || undefined,
         email: userInfo.email || `user-${userInfo.openId}@videxa.studio`,
         loginMethod: userInfo.loginMethod ?? userInfo.platform ?? undefined,
-        lastSignedIn: new Date(),
+        lastSignedIn: new Date().toISOString(),
       });
 
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
