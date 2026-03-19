@@ -147,7 +147,7 @@ export default function HeroSection() {
             <div className="animate-fade-in mt-4 flex gap-8 pt-6 border-t border-[#252D42]" style={{ animationDelay: "0.7s" }}>
               <StatItem end={120} suffix="+" label="Proyectos" />
               <StatItem end={98} suffix="%" label="Satisfacción" />
-              <StatItem end={4} suffix="+" label="Anos exp." />
+              <StatItem end={4} suffix="+" label="Años exp." />
             </div>
           </div>
 
